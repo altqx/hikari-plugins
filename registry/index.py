@@ -54,17 +54,17 @@ def content_hash(body: dict) -> str:
     return hashlib.sha256(json.dumps(body, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
 
 
-def finish(body: dict, root: Path, now: datetime) -> tuple[dict, bool]:
-    """Adds serial and generated. The serial only grows, and only when the content changes."""
+def finish(body: dict, root: Path, now: datetime, key_id: str) -> tuple[dict, bool]:
+    """Adds serial and generated. The serial only grows: with the content, or with a new signing key."""
     path = root / "published" / "_index.json"
     last = json.loads(path.read_text()) if path.exists() else {"serial": 0, "sha256": ""}
     digest = content_hash(body)
-    changed = digest != last["sha256"]
+    changed = digest != last["sha256"] or key_id != last.get("key")
     serial = last["serial"] + 1 if changed else last["serial"]
     generated = now.strftime("%Y-%m-%dT%H:%M:%SZ") if changed else last.get("generated")
     if changed:
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps({"serial": serial, "sha256": digest, "generated": generated}, indent=2) + "\n")
+        path.write_text(json.dumps({"serial": serial, "sha256": digest, "generated": generated, "key": key_id}, indent=2) + "\n")
     return {"format": FORMAT, "serial": serial, "generated": generated, **{k: v for k, v in body.items() if k != "format"}}, changed
 
 

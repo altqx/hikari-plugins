@@ -72,7 +72,11 @@ def _secret(args) -> minisign.SecretKey:
     text = os.environ.get("MARKETPLACE_MINISIGN_KEY")
     if not text:
         raise SystemExit("No signing key: pass --test-key, or set MARKETPLACE_MINISIGN_KEY")
-    return minisign.parse_secret_key(text, os.environ.get("MARKETPLACE_MINISIGN_PASSWORD"))
+    secret = minisign.parse_secret_key(text, os.environ.get("MARKETPLACE_MINISIGN_PASSWORD"))
+    pinned = ROOT / "keys" / "marketplace.pub"
+    if args.command != "key-info" and (not pinned.exists() or minisign.parse_public_key(pinned.read_text()) != secret.public):
+        raise SystemExit("The signing key does not match keys/marketplace.pub")
+    return secret
 
 
 def run_publish(args) -> int:
@@ -92,12 +96,26 @@ def run_publish(args) -> int:
 def publish_index(current, featured, config, uploader, secret, now) -> int:
     states = {pid: publish.load_state(ROOT, pid) for pid in current}
     body = index.build(current, states, featured, config)
-    full, changed = index.finish(body, ROOT, now)
+    full, changed = index.finish(body, ROOT, now, secret.public.id_text)
     data = index.encode(full)
     if changed or uploader.get("index.json") != data:
         uploader.put("index.json", data, immutable=False)
         uploader.put("index.json.minisig", index.sign(data, full, secret).encode(), immutable=False)
         _summary(f"index.json serial {full['serial']}, signed by key {secret.public.id_text}.")
+    return 0
+
+
+def backfill(args) -> int:
+    from .github import download
+
+    config = listings.load_config(ROOT)
+    count = publish.backfill(ROOT, listings.load_listings(ROOT), config, upload.make(args.upload), download)
+    _summary(f"Backfilled {count} versions.")
+    return 0
+
+
+def key_info(args) -> int:
+    sys.stdout.write(_secret(args).public.file_text())
     return 0
 
 
@@ -117,12 +135,19 @@ def main() -> int:
     p.add_argument("--listing", help="your plugins/<id>.json; the .minisig must sit beside the package")
     p.set_defaults(func=check_package)
     p = sub.add_parser("publish", help="publish new releases and the signed index")
-    p.add_argument("--upload", default="dry-run", help="dry-run or local:<folder>")
+    p.add_argument("--upload", default="dry-run", help="dry-run, local:<folder> or r2:<bucket>")
     p.add_argument("--test-key", action="store_true", help="sign with the throwaway test key")
     p.set_defaults(func=run_publish)
+    p = sub.add_parser("backfill", help="upload published versions missing from the target")
+    p.add_argument("--upload", required=True)
+    p.set_defaults(func=backfill)
+    p = sub.add_parser("key-info", help="print the public key of MARKETPLACE_MINISIGN_KEY")
+    p.add_argument("--test-key", action="store_true")
+    p.set_defaults(func=key_info)
     p = sub.add_parser("test-key", help="print the throwaway test key's .pub")
     p.set_defaults(func=test_key)
     args = parser.parse_args()
+    args.command = args.func.__name__.replace("_", "-")
     return args.func(args)
 
 

@@ -28,6 +28,10 @@ def _request(method: str, path: str, body: dict | None = None, accept: str = "ap
     return data if accept == "application/octet-stream" else json.loads(data or b"null")
 
 
+def download(url: str, limit: int = 64 * 1024 * 1024 + 1) -> bytes:
+    return _request("GET", url, accept="application/octet-stream", limit=limit, auth=False)
+
+
 class GitHubSource:
     def releases(self, repo: str) -> list[Release]:
         out = []

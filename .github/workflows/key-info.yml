@@ -1,0 +1,23 @@
+name: Key info
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-key:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: The marketplace key's public half
+        run: python -m registry key-info | tee -a "$GITHUB_STEP_SUMMARY"
+        env:
+          MARKETPLACE_MINISIGN_KEY: ${{ secrets.MARKETPLACE_MINISIGN_KEY }}
+          MARKETPLACE_MINISIGN_PASSWORD: ${{ secrets.MARKETPLACE_MINISIGN_PASSWORD }}
