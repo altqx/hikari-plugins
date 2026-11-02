@@ -1,0 +1,2 @@
+cryptography==50.0.2
+jsonschema==4.26.0

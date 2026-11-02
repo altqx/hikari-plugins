@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: sudo apt-get install -y --no-install-recommends minisign
+      - run: pip install -r requirements.txt
+      - name: Tests
+        run: python -m unittest -v
+        env:
+          MINISIGN_SCRYPT_TEST: "1"
+      - name: Listings
+        run: python -m registry check-listings ${{ github.event_name == 'pull_request' && format('--base origin/{0}', github.base_ref) || '' }}
