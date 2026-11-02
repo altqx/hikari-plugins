@@ -2,6 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://marketplace.hikarisub.org/schemas/listing.schema.json",
   "title": "HikariSub marketplace listing (plugins/<id>.json)",
+  "description": "Each release of the listed plugin must pass PL1's package and media rules. SVG icons follow PL1's rules, and the registry adds one of its own: no <style> element and no style attribute, only presentation attributes such as fill and stroke. Every attribute value is read as CSS after character references and CSS escapes are decoded, and is refused if it holds @import, expression( or a url( that points anywhere other than #…. A refusal reads like HikariSub's: \"The package breaks the media rules: <path> <what is wrong>.\"",
   "type": "object",
   "required": ["id", "author", "repo", "publicKey", "categories"],
   "additionalProperties": false,
