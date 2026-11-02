@@ -7,6 +7,11 @@ on:
   schedule:
     - cron: "*/30 * * * *"
   workflow_dispatch:
+    inputs:
+      backfill:
+        description: Upload published versions that R2 lacks
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -27,11 +32,20 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt
-      # Until the Cloudflare side is confirmed: the throwaway test key, and a local folder instead of R2.
+      - name: Backfill
+        if: inputs.backfill
+        run: python -m registry backfill --upload r2:hikari-marketplace
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
       - name: Publish
-        run: python -m registry publish --test-key --upload local:out/site
+        run: python -m registry publish --upload r2:hikari-marketplace
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          MARKETPLACE_MINISIGN_KEY: ${{ secrets.MARKETPLACE_MINISIGN_KEY }}
+          MARKETPLACE_MINISIGN_PASSWORD: ${{ secrets.MARKETPLACE_MINISIGN_PASSWORD }}
       - name: Save the published state
         run: |
           git config user.name "github-actions[bot]"
@@ -42,8 +56,3 @@ jobs:
             git pull --rebase origin main
             git push origin HEAD:main
           fi
-      - uses: actions/upload-artifact@v4
-        with:
-          name: site
-          path: out/site
-          if-no-files-found: ignore
