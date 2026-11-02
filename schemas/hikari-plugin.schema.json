@@ -199,7 +199,7 @@
       "pattern": "^[^\\u0000-\\u001F\\u007F]+$"
     },
     "icon": {
-      "description": "A file in the package: a 256 × 256 px PNG or a square SVG.",
+      "description": "A file in the package: a 256 × 256 px PNG or a square SVG. SVG icons follow PL1's rules, and the registry adds one of its own: no <style> element and no style attribute, only presentation attributes such as fill and stroke. Every attribute value is read as CSS after character references and CSS escapes are decoded, and is refused if it holds @import, expression( or a url( that points anywhere other than #….",
       "$ref": "#/$defs/IconPath"
     },
     "screenshots": {

@@ -110,23 +110,25 @@ def open_package(data: bytes, api_version: int) -> Package:
 
 def _check_media(pkg: Package) -> None:
     m, files = pkg.manifest, pkg.files
+    missing = "names no file in the package (the case must match)"
     total = 0
     try:
         if icon := m.get("icon"):
             if icon not in files:
-                raise media.MediaError(f"{icon}: icon missing")
+                raise media.MediaError(icon, missing)
             media.check_icon(icon, files[icon])
             total += len(files[icon])
-        paths = [s["path"] for s in m.get("screenshots", [])]
-        if len(set(paths)) != len(paths):
-            raise media.MediaError("a screenshot is listed twice")
-        for path in paths:
+        shown = set()
+        for path in (s["path"] for s in m.get("screenshots", [])):
+            if path in shown:
+                raise media.MediaError(path, "repeats another screenshot")
+            shown.add(path)
             if path not in files:
-                raise media.MediaError(f"{path}: screenshot missing")
+                raise media.MediaError(path, missing)
             pkg.screenshot_sizes.append(media.check_screenshot(path, files[path]))
             total += len(files[path])
-        if total > media.MAX_MEDIA_TOTAL:
-            raise media.MediaError("icon and screenshots are over 8 MiB together")
+            if total > media.MAX_MEDIA_TOTAL:
+                raise media.MediaError(path, "takes the icon and screenshots past 8 MiB together")
         if README in files:
             pkg.readme = media.check_readme(files[README])
     except media.MediaError as e:

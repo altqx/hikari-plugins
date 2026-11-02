@@ -47,36 +47,52 @@ class PackageTests(unittest.TestCase):
         self.refused(files_for(manifest(screenshots=[{"path": "a.png"}])), "manifest: screenshots")
 
     def test_icon(self):
-        self.refused(files_for(manifest(), **{"icon.png": png(128, 128)}), "256 × 256")
-        self.refused(files_for(manifest(), **{"icon.png": jpeg(256, 256)}), "not a PNG")
-        self.refused(files_for(manifest(icon="missing.png")), "icon missing")
+        self.refused(files_for(manifest(), **{"icon.png": png(128, 128)}), r"icon\.png is 128x128 px, not 256x256 px\.$")
+        self.refused(files_for(manifest(), **{"icon.png": jpeg(256, 256)}), r"icon\.png isn't a PNG")
+        self.refused(files_for(manifest(icon="missing.png")), r"missing\.png names no file in the package")
         opened(files_for(manifest(icon="icon.svg"), **{"icon.svg": SVG}))
+        opened(files_for(manifest(icon="icon.svg"), **{"icon.svg": b'<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" '
+                                                       b'"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' + SVG}))
+        opened(files_for(manifest(icon="icon.svg"), **{"icon.svg": SVG.replace(b'fill="#145c4c"', b'fill="url(#g)"')}))
         for svg, why in [
-            (SVG.replace(b"0 0 48 48", b"0 0 48 40"), "square viewBox"),
-            (SVG.replace(b"<rect", b"<script>alert(1)</script><rect"), "<script>"),
-            (SVG.replace(b"<rect", b'<rect onclick="x()"'), "onclick"),
-            (SVG.replace(b"<rect", b'<image href="https://evil.example/x.png"/><rect'), "links outside"),
-            (SVG.replace(b'fill="#145c4c"', b'fill="url(https://evil.example/p)"'), "outside url"),
-            (SVG.replace(b"<rect", b"<style>@import 'https://evil.example/a.css';</style><rect"), "imports"),
-            (b'<!DOCTYPE svg [<!ENTITY x "y">]>' + SVG, "DOCTYPE"),
+            (SVG.replace(b"0 0 48 48", b"0 0 48 40"), "has no square viewBox on its <svg>"),
+            (SVG.replace(b"<rect", b"<script>alert(1)</script><rect"), "holds a <script> element"),
+            (SVG.replace(b"<rect", b'<rect onclick="x()"'), "has an onclick attribute"),
+            (SVG.replace(b"<rect", b'<image href="https://evil.example/x.png"/><rect'), "has an href that points outside"),
+            (SVG.replace(b"<rect", b'<image HREF="https://evil.example/x.png"/><rect'), "has an HREF that points outside"),
+            (SVG.replace(b'fill="#145c4c"', b'fill="url(https://evil.example/p)"'), "url\\( that points outside"),
+            (SVG.replace(b'fill="#145c4c"', b'fill="&#117;rl(https://evil.example/p)"'), "url\\( that points outside"),
+            (SVG.replace(b'fill="#145c4c"', b'fill="\\75 rl(https://evil.example/p)"'), "url\\( that points outside"),
+            (SVG.replace(b'fill="#145c4c"', b'fill="\\@import x"'), "imports a style sheet"),
+            (SVG.replace(b'fill="#145c4c"', b'fill="expression(alert(1))"'), "CSS expression"),
+            (SVG.replace(b"<rect", b"<text>url(https://evil.example/p)</text><rect"), "url\\( that points outside"),
+            (SVG.replace(b"<rect", b"<style>rect{fill:red}</style><rect"), "holds a <style> element"),
+            (SVG.replace(b"<rect", b"<style>@import 'https://evil.example/a.css';</style><rect"), "holds a <style> element"),
+            (SVG.replace(b"<rect", b'<rect style="fill:red"'), "has a style attribute"),
+            (b'<!DOCTYPE svg [<!ENTITY x "y">]>' + SVG, "declares entities or attributes in its DOCTYPE"),
+            (b"<svg", "isn't well-formed XML"),
         ]:
             with self.subTest(why):
-                self.refused(files_for(manifest(icon="icon.svg"), **{"icon.svg": svg}), why)
+                self.refused(files_for(manifest(icon="icon.svg"), **{"icon.svg": svg}),
+                             r"^The package breaks the media rules: icon\.svg .*" + why)
 
     def test_screenshots(self):
         opened(files_for(manifest(screenshots=[{"path": "s.jpg", "caption": "c"}]), **{"s.jpg": jpeg(1920, 1080)}))
         opened(files_for(manifest(), **{"shots/one.png": png(1366, 768)}))
         for shot, why in [(png(1280, 960), "16:9"), (png(1024, 576), "16:9"), (png(2560, 1440), "16:9"),
-                          (jpeg(1280, 720), "not a PNG")]:
+                          (jpeg(1280, 720), "isn't a PNG")]:
             with self.subTest(why):
                 self.refused(files_for(manifest(), **{"shots/one.png": shot}), why)
         twice = [{"path": "shots/one.png", "caption": "a"}, {"path": "shots/one.png", "caption": "b"}]
-        self.refused(files_for(manifest(screenshots=twice)), "listed twice")
-        self.refused(files_for(manifest(), **{"shots/one.png": png(1280, 720) + bytes(2 * 1024 * 1024)}), "2 MiB")
+        self.refused(files_for(manifest(screenshots=twice)), r"shots/one\.png repeats another screenshot")
+        self.refused(files_for(manifest(), **{"shots/one.png": png(1280, 720) + bytes(2 * 1024 * 1024)}),
+                     r"shots/one\.png is larger than 2 MiB")
+        self.refused(files_for(manifest(), **{"shots/one.png": png(1280, 960)}),
+                     r"shots/one\.png is 1280x960 px; a screenshot is 16:9, from 1280x720 to 1920x1080 px\.$")
 
     def test_readme(self):
-        self.refused(files_for(manifest(), **{"README.md": b"\xff\xfe"}), "not UTF-8")
-        self.refused(files_for(manifest(), **{"README.md": b"a" * (128 * 1024 + 1)}), "128 KiB")
+        self.refused(files_for(manifest(), **{"README.md": b"\xff\xfe"}), r"README\.md isn't UTF-8")
+        self.refused(files_for(manifest(), **{"README.md": b"a" * (128 * 1024 + 1)}), r"README\.md is larger than 128 KiB")
 
     def test_schema_matches_pl1_plus_media(self):
         schema = json.loads(package.SCHEMA.read_text())
