@@ -124,24 +124,31 @@ def _ext(path: str) -> str:
     return path.rsplit(".", 1)[1]
 
 
-def _publish(listing, version, release, data, pkg, sha, state, uploader, now) -> None:
-    pid, m = listing["id"], pkg.manifest
-    base = f"p/{pid}/{version}"
-    uploader.put(f"{base}.hikariplugin", data, immutable=True)
-    media = {}
+def _media_entry(pid: str, version: str, pkg: package.Package) -> dict:
+    m, base = pkg.manifest, f"p/{pid}/{version}"
+    media = {"readme": f"{base}/README.md"}
     if icon := m.get("icon"):
         media["icon"] = f"{base}/icon.{_ext(icon)}"
-        uploader.put(media["icon"], pkg.files[icon], immutable=True)
-    shots = []
-    for n, s in enumerate(m.get("screenshots", []), 1):
-        key = f"{base}/screenshot-{n}.{_ext(s['path'])}"
-        uploader.put(key, pkg.files[s["path"]], immutable=True)
-        w, h = pkg.screenshot_sizes[n - 1]
-        shots.append({"path": key, "caption": s["caption"], "width": w, "height": h})
+    shots = [{"path": f"{base}/screenshot-{n}.{_ext(s['path'])}", "caption": s["caption"], "width": w, "height": h}
+             for n, (s, (w, h)) in enumerate(zip(m.get("screenshots", []), pkg.screenshot_sizes), 1)]
     if shots:
         media["screenshots"] = shots
-    media["readme"] = f"{base}/README.md"
-    uploader.put(media["readme"], pkg.files[package.README], immutable=True)
+    return media
+
+
+def upload_files(pid: str, entry: dict, data: bytes, pkg: package.Package, uploader) -> None:
+    """The package and its media, at the keys the published entry names. Packages go last-but-index."""
+    m = pkg.manifest
+    if "icon" in entry:
+        uploader.put(entry["icon"], pkg.files[m["icon"]], immutable=True)
+    for shot, source in zip(entry.get("screenshots", []), m.get("screenshots", [])):
+        uploader.put(shot["path"], pkg.files[source["path"]], immutable=True)
+    uploader.put(entry["readme"], pkg.files[package.README], immutable=True)
+    uploader.put(f"p/{pid}/{entry['version']}.hikariplugin", data, immutable=True)
+
+
+def _publish(listing, version, release, data, pkg, sha, state, uploader, now) -> None:
+    pid, m = listing["id"], pkg.manifest
     entry = {
         "version": version,
         "sha256": sha,
@@ -158,10 +165,28 @@ def _publish(listing, version, release, data, pkg, sha, state, uploader, now) ->
         "published": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "release": release.url,
         "changelog": release.notes.strip()[:MAX_CHANGELOG],
-        **media,
+        **_media_entry(pid, version, pkg),
     }
-    state["versions"].insert(0, {k: v for k, v in entry.items() if v is not None})
+    entry = {k: v for k, v in entry.items() if v is not None}
+    upload_files(pid, entry, data, pkg, uploader)
+    state["versions"].insert(0, entry)
     state["versions"].sort(key=lambda v: semver.key(v["version"]), reverse=True)
+
+
+def backfill(root: Path, listings: dict[str, dict], config: Config, uploader, fetch) -> int:
+    """Puts every published version missing from `uploader` back, fetched from its release and checked."""
+    count = 0
+    for pid in sorted(listings):
+        for v in load_state(root, pid)["versions"]:
+            if uploader.get(f"p/{pid}/{v['version']}.hikariplugin") is not None:
+                continue
+            url = v["release"].replace("/releases/tag/", "/releases/download/") + f"/{pid}-{v['version']}.hikariplugin"
+            data = fetch(url)
+            if hashlib.sha256(data).hexdigest() != v["sha256"]:
+                raise Refused(f"{pid} {v['version']}: the release asset no longer matches what was published")
+            upload_files(pid, v, data, package.open_package(data, config.newest_api), uploader)
+            count += 1
+    return count
 
 
 def run(root: Path, listings: dict[str, dict], config: Config, source: Source, uploader, reviewer: Reviewer,

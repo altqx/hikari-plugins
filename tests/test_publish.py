@@ -39,7 +39,8 @@ class PublishTests(unittest.TestCase):
         config = listings.load_config(self.root.path)
         report = publish.run(self.root.path, current, config, self.source, self.uploader, self.reviewer, NOW)
         states = {pid: publish.load_state(self.root.path, pid) for pid in current}
-        full, changed = index.finish(index.build(current, states, [], config), self.root.path, NOW)
+        full, changed = index.finish(index.build(current, states, [], config), self.root.path, NOW,
+                                     TEST_KEY.public.id_text)
         data = index.encode(full)
         if changed:
             self.uploader.put("index.json", data, immutable=False)
@@ -177,6 +178,37 @@ class PublishTests(unittest.TestCase):
         self.uploader.put("p/x/1.0.0.hikariplugin", b"one", immutable=True)
         with self.assertRaisesRegex(upload.UploadError, "never change"):
             self.uploader.put("p/x/1.0.0.hikariplugin", b"two", immutable=True)
+
+    def test_a_new_signing_key_bumps_the_serial(self):
+        current = listings.load_listings(self.root.path)
+        body = index.build(current, {}, [], listings.load_config(self.root.path))
+        self.assertEqual(index.finish(body, self.root.path, NOW, "AAAA")[0]["serial"], 1)
+        self.assertEqual(index.finish(body, self.root.path, NOW, "AAAA")[1], False)
+        full, changed = index.finish(body, self.root.path, NOW, "BBBB")
+        self.assertEqual((full["serial"], changed), (2, True))
+
+    def test_backfill_puts_back_only_what_is_missing_and_checks_it(self):
+        data = self.add("1.0.0")
+        self.add("1.1.0")
+        self.run_once()
+        (self.site / "p/alice.karaoke-flow/1.0.0.hikariplugin").unlink()
+        fresh = upload.LocalUploader(self.site / "fresh")
+        fetched = []
+
+        def fetch(url):
+            fetched.append(url)
+            return data if url.endswith("1.0.0.hikariplugin") else package("1.1.0")
+
+        current = listings.load_listings(self.root.path)
+        config = listings.load_config(self.root.path)
+        self.assertEqual(publish.backfill(self.root.path, current, config, fresh, fetch), 2)
+        self.assertIn("https://github.com/alice/karaoke-flow/releases/download/v1.0.0/"
+                      "alice.karaoke-flow-1.0.0.hikariplugin", fetched)
+        self.assertTrue((self.site / "fresh/p/alice.karaoke-flow/1.0.0/screenshot-1.png").exists())
+        self.assertEqual(publish.backfill(self.root.path, current, config, fresh, fetch), 0)
+        with self.assertRaisesRegex(publish.Refused, "no longer matches"):
+            publish.backfill(self.root.path, current, config, upload.LocalUploader(self.site / "other"),
+                             lambda url: b"changed")
 
     def test_the_index_matches_its_schema(self):
         import jsonschema
