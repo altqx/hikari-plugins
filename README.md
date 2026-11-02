@@ -53,8 +53,8 @@ A pull request to the listing:
 
 ## Keys and storage
 
-- **Now:** CI signs with a throwaway test key whose secret is in [`registry/testkey.py`](registry/testkey.py), and writes to a local folder kept as the run's artifact. Nothing trusts that key.
-- **Later:** the marketplace key, kept as the `MARKETPLACE_MINISIGN_KEY` secret (with `MARKETPLACE_MINISIGN_PASSWORD` if it has one), and upload to Cloudflare R2. Both wait for the owner.
+- **Signing:** CI signs `index.json` with the marketplace key, kept as the `MARKETPLACE_MINISIGN_KEY` and `MARKETPLACE_MINISIGN_PASSWORD` secrets. It refuses any key but [`keys/marketplace.pub`](keys/marketplace.pub), the key HikariSub pins. The owner holds the offline copy; no key lives in a Worker. Tests use a throwaway key ([`registry/testkey.py`](registry/testkey.py)) that nothing trusts.
+- **Storage:** packages, media and the index go to the private Cloudflare R2 bucket `hikari-marketplace` through the `CLOUDFLARE_API_TOKEN` secret. The Worker that serves them at marketplace.hikarisub.org comes with the go-live. Running Publish by hand with “backfill” uploads any published version R2 lacks, fetched again from its release and checked against its SHA-256.
 
 ## Development
 
