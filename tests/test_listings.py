@@ -59,6 +59,18 @@ class ListingTests(unittest.TestCase):
         self.root.add_listing(self.official(pub("alice")))
         self.problems("the handle hikarisub is reserved")
 
+    def test_look_alikes_of_a_reserved_handle_are_refused(self):
+        for handle in ("hikari-sub", "hikarisub-official", "myhikarisub", "hikarisubs"):
+            with self.subTest(handle=handle):
+                root = TempRoot()
+                root.add_listing(listing(pid=f"{handle}.tools", author=handle))
+                with self.assertRaisesRegex(listings.ListingError, f"the handle {handle} is too close to the reserved "
+                                                                   "handle hikarisub"):
+                    listings.load_listings(root.path)
+                root.cleanup()
+        self.root.add_listing(listing(pid="hikari-fan.tools", author="hikari-fan"))
+        self.assertIn("hikari-fan.tools", listings.load_listings(self.root.path))
+
     def test_one_repo_holds_one_handles_plugins(self):
         self.root.add_listing(listing())
         self.root.add_listing(listing(pid="alice.romaji-split"))

@@ -66,8 +66,11 @@ def load_listings(root: Path) -> dict[str, dict]:
 
 
 def _reserved_handle_problems(root: Path, listings: dict[str, dict]) -> list[str]:
-    out = []
-    for handle, key_file in load_config(root).reserved_handles.items():
+    reserved = load_config(root).reserved_handles
+    out = [f"{x['id']}.json: the handle {x['author']} is too close to the reserved handle {handle}"
+           for x in listings.values() for handle in reserved
+           if x["author"] != handle and handle in x["author"].replace("-", "")]
+    for handle, key_file in reserved.items():
         mine = [x for x in listings.values() if x["author"] == handle]
         if not mine:
             continue
