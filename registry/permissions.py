@@ -10,6 +10,8 @@ def increase(old: dict | None, new: dict) -> list[str]:
         out.append("the unrestricted tier")
     if "documents.all" in after and "documents.all" not in before:
         out.append("every open document (documents.all)")
+    if "vcs.read" in after and "vcs.read" not in before:
+        out.append("the git repository's branches, tags and history (vcs.read)")
     old_hosts = set(before.get("network", {}).get("hosts", []))
     for host in after.get("network", {}).get("hosts", []):
         if host not in old_hosts:

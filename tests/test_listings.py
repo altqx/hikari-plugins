@@ -124,6 +124,10 @@ class PermissionTests(unittest.TestCase):
         self.assertEqual(permissions.increase(none, {"permissions": {"documents.all": "r"}}),
                          ["every open document (documents.all)"])
         self.assertEqual(permissions.increase(none, {"tier": "unrestricted"}), ["the unrestricted tier"])
+        git = {"permissions": {"vcs.read": "r"}}
+        self.assertEqual(permissions.increase(none, git), ["the git repository's branches, tags and history (vcs.read)"])
+        self.assertEqual(permissions.increase(git, {"permissions": {"vcs.read": "changed"}}), [])
+        self.assertEqual(permissions.increase(git, none), [])
 
 
 class SemverTests(unittest.TestCase):
