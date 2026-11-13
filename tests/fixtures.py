@@ -1,5 +1,6 @@
 import io
 import json
+import os
 import shutil
 import struct
 import tempfile
@@ -16,6 +17,10 @@ KEYS = {
     "alice": minisign.SecretKey(b"ALICEKEY", bytes(range(32))),
     "bob": minisign.SecretKey(b"BOB__KEY", bytes(range(32, 64))),
 }
+
+
+def throwaway_key() -> minisign.SecretKey:
+    return minisign.SecretKey(os.urandom(8), os.urandom(32))
 
 
 def pub(name: str) -> str:
@@ -89,11 +94,13 @@ def listing(pid="alice.karaoke-flow", author="alice", key="alice", **extra) -> d
 class FakeSource:
     def __init__(self):
         self.by_repo: dict[str, list[Release]] = {}
+        self.asked: list[str] = []
 
     def add(self, repo: str, rel: Release) -> None:
         self.by_repo.setdefault(repo, []).append(rel)
 
     def releases(self, repo: str) -> list[Release]:
+        self.asked.append(repo)
         return list(self.by_repo.get(repo, []))
 
 
@@ -121,6 +128,13 @@ class TempRoot:
 
     def add_listing(self, data: dict) -> None:
         (self.path / "plugins" / f"{data['id']}.json").write_text(json.dumps(data))
+
+    def reserve(self, handle: str, key: minisign.SecretKey) -> None:
+        config = json.loads((self.path / "config" / "registry.json").read_text())
+        config["reservedHandles"] = {handle: f"keys/{handle}.pub"}
+        (self.path / "config" / "registry.json").write_text(json.dumps(config))
+        (self.path / "keys").mkdir(exist_ok=True)
+        (self.path / "keys" / f"{handle}.pub").write_text(key.public.file_text())
 
     def approve(self, pid: str, version: str, record: dict) -> None:
         path = self.path / "approvals" / pid / f"{version}.json"

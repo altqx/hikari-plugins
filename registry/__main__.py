@@ -90,10 +90,15 @@ def run_publish(args) -> int:
     now = datetime.now(UTC)
     report = publish.run(ROOT, current, config, GitHubSource(), uploader, GitHubReviewer(), now)
     _summary(report.summary())
-    return publish_index(current, featured, config, uploader, secret, now)
+    serial = publish_index(current, featured, config, uploader, secret, now)
+    if serial is not None and (path := os.environ.get("GITHUB_OUTPUT")):
+        with open(path, "a") as f:
+            f.write(f"index-serial={serial}\n")
+    return 0
 
 
-def publish_index(current, featured, config, uploader, secret, now) -> int:
+def publish_index(current, featured, config, uploader, secret, now) -> int | None:
+    """Uploads the signed index when it differs from what the target holds. Returns the uploaded serial."""
     states = {pid: publish.load_state(ROOT, pid) for pid in current}
     body = index.build(current, states, featured, config)
     full, changed = index.finish(body, ROOT, now, secret.public.id_text)
@@ -102,6 +107,19 @@ def publish_index(current, featured, config, uploader, secret, now) -> int:
         uploader.put("index.json", data, immutable=False)
         uploader.put("index.json.minisig", index.sign(data, full, secret).encode(), immutable=False)
         _summary(f"index.json serial {full['serial']}, signed by key {secret.public.id_text}.")
+        return full["serial"]
+    return None
+
+
+def notify_site(args) -> int:
+    from .github import SITE, dispatch_index_published
+
+    token = os.environ.get("MARKETPLACE_DISPATCH_TOKEN")
+    if not token:
+        _summary(f"No MARKETPLACE_DISPATCH_TOKEN: run {SITE}'s Deploy production by hand.")
+        return 0
+    dispatch_index_published(args.serial, token)
+    _summary(f"Asked {SITE} to rebuild from index serial {args.serial}.")
     return 0
 
 
@@ -138,6 +156,9 @@ def main() -> int:
     p.add_argument("--upload", default="dry-run", help="dry-run, local:<folder> or r2:<bucket>")
     p.add_argument("--test-key", action="store_true", help="sign with the throwaway test key")
     p.set_defaults(func=run_publish)
+    p = sub.add_parser("notify-site", help="ask the marketplace site to rebuild from a newly uploaded index")
+    p.add_argument("--serial", type=int, required=True)
+    p.set_defaults(func=notify_site)
     p = sub.add_parser("backfill", help="upload published versions missing from the target")
     p.add_argument("--upload", required=True)
     p.set_defaults(func=backfill)
