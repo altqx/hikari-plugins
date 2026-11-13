@@ -1,8 +1,8 @@
 import json
 import unittest
 
-from registry import listings, permissions, semver
-from tests.fixtures import TempRoot, listing, pub
+from registry import listings, minisign, permissions, semver
+from tests.fixtures import REPO, TempRoot, listing, pub, throwaway_key
 
 
 class ListingTests(unittest.TestCase):
@@ -32,6 +32,40 @@ class ListingTests(unittest.TestCase):
         self.root.add_listing(listing())
         self.root.add_listing(listing(pid="alice.romaji-split", key="bob"))
         self.problems("already uses another key")
+
+    def official(self, key: str, pid="hikarisub.macro-chains") -> dict:
+        return listing(pid=pid, author="hikarisub", authorName="HikariSub", key="alice", publicKey=key,
+                       repo="github.com/altqx/hikari-official-plugins")
+
+    def test_the_reserved_handle_takes_only_its_own_key(self):
+        official = throwaway_key()
+        self.root.reserve("hikarisub", official)
+        self.root.add_listing(self.official(official.public.text))
+        self.assertIn("hikarisub.macro-chains", listings.load_listings(self.root.path))
+        self.root.add_listing(self.official(pub("alice")))
+        self.problems(f"the handle hikarisub is reserved for key {official.public.id_text}")
+
+    def test_the_reserved_handle_is_refused_while_its_key_is_missing(self):
+        self.root.reserve("hikarisub", throwaway_key())
+        (self.root.path / "keys" / "hikarisub.pub").unlink()
+        self.root.add_listing(self.official(pub("alice")))
+        self.problems("the handle hikarisub is reserved, and its key keys/hikarisub.pub can't be read")
+
+    def test_hikarisub_is_reserved_for_the_official_key(self):
+        config = listings.load_config(REPO)
+        self.assertEqual(config.reserved_handles, {"hikarisub": "keys/hikarisub.pub"})
+        key = minisign.parse_public_key((REPO / "keys" / "hikarisub.pub").read_text())
+        self.assertEqual(key.id_text, "C399EBCEA48BCB30")
+        self.root.add_listing(self.official(pub("alice")))
+        self.problems("the handle hikarisub is reserved")
+
+    def test_one_repo_holds_one_handles_plugins(self):
+        self.root.add_listing(listing())
+        self.root.add_listing(listing(pid="alice.romaji-split"))
+        self.assertEqual(listings.shared_repos(listings.load_listings(self.root.path)),
+                         {"github.com/alice/karaoke-flow"})
+        self.root.add_listing(listing(pid="bob.tools", author="bob", key="bob"))
+        self.problems("github.com/alice/karaoke-flow is listed by more than one handle: alice, bob")
 
     def test_schema(self):
         self.root.add_listing(listing(categories=["Karaoke", "Timing", "Utilities"]))

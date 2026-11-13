@@ -17,9 +17,12 @@ class FakeGitHub:
         self.branches = set(branches)
         self.issues = list(issues)
         self.calls = []
+        self.tokens = []
 
-    def __call__(self, method, path, body=None, **_):
+    def __call__(self, method, path, body=None, token=None, **_):
         self.calls.append((method, path, body))
+        if token:
+            self.tokens.append(token)
         if method == "GET" and "/branches/" in path:
             if path.rsplit("/branches/", 1)[1] in self.branches:
                 return {}
@@ -79,6 +82,46 @@ class ReviewerTests(unittest.TestCase):
         fake = FakeGitHub(issues=["alice.karaoke-flow%201.2.0%20was%20refused"])
         self.run_with(fake, github.GitHubReviewer.report_refusal, LISTING, "1.2.0", ["the signature doesn't verify"])
         self.assertEqual(fake.writes(), [])
+
+
+class DispatchTests(unittest.TestCase):
+    def test_a_new_index_asks_the_site_to_rebuild(self):
+        fake = FakeGitHub()
+        with mock.patch.object(github, "_request", fake):
+            github.dispatch_index_published(7, "placeholder-token")
+        self.assertEqual(fake.writes(), [("POST", "/repos/altqx/hikari-marketplace/dispatches")])
+        self.assertEqual(fake.body("POST", "/repos/altqx/hikari-marketplace/dispatches"),
+                         {"event_type": "index-published", "client_payload": {"serial": 7}})
+        self.assertEqual(fake.tokens, ["placeholder-token"])
+
+    def test_the_dispatch_carries_its_own_token(self):
+        sent = []
+
+        class Response(io.BytesIO):
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_):
+                return False
+
+        def urlopen(req, timeout):
+            sent.append(req)
+            return Response(b"")
+
+        with mock.patch.object(github.urllib.request, "urlopen", urlopen), \
+                mock.patch.dict(github.os.environ, {"GITHUB_TOKEN": "workflow-token"}):
+            github.dispatch_index_published(7, "dispatch-token")
+        self.assertEqual(sent[0].get_header("Authorization"), "Bearer dispatch-token")
+        self.assertEqual(sent[0].full_url, "https://api.github.com/repos/altqx/hikari-marketplace/dispatches")
+
+    def test_without_a_token_nothing_is_sent(self):
+        import argparse
+
+        import registry.__main__ as cli
+        fake = FakeGitHub()
+        with mock.patch.object(github, "_request", fake), mock.patch.dict(github.os.environ, {}, clear=True):
+            self.assertEqual(cli.notify_site(argparse.Namespace(serial=7)), 0)
+        self.assertEqual(fake.calls, [])
 
 
 if __name__ == "__main__":

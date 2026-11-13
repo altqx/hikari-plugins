@@ -1,7 +1,7 @@
 """Loads plugins/*.json, featured.json and config/registry.json, and checks them together."""
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import cache
 from pathlib import Path
 
@@ -20,6 +20,7 @@ class ListingError(Exception):
 class Config:
     base_url: str
     api_versions: dict[str, str]
+    reserved_handles: dict[str, str] = field(default_factory=dict)
 
     @property
     def newest_api(self) -> int:
@@ -33,7 +34,7 @@ def _validator():
 
 def load_config(root: Path) -> Config:
     data = json.loads((root / "config" / "registry.json").read_text())
-    return Config(data["baseUrl"].rstrip("/"), data["apiVersions"])
+    return Config(data["baseUrl"].rstrip("/"), data["apiVersions"], data.get("reservedHandles", {}))
 
 
 def load_listings(root: Path) -> dict[str, dict]:
@@ -57,9 +58,51 @@ def load_listings(root: Path) -> dict[str, dict]:
         if handle in keys and keys[handle][1] != key:
             problems.append(f"{listing['id']}.json: {handle} already uses another key in {keys[handle][0]}.json")
         keys.setdefault(handle, (listing["id"], key))
+    problems += _reserved_handle_problems(root, listings)
+    problems += _shared_repo_problems(listings)
     if problems:
         raise ListingError("\n".join(problems))
     return listings
+
+
+def _reserved_handle_problems(root: Path, listings: dict[str, dict]) -> list[str]:
+    out = []
+    for handle, key_file in load_config(root).reserved_handles.items():
+        mine = [x for x in listings.values() if x["author"] == handle]
+        if not mine:
+            continue
+        try:
+            key = minisign.parse_public_key((root / key_file).read_text())
+        except (OSError, minisign.MinisignError) as e:
+            out += [f"{x['id']}.json: the handle {handle} is reserved, and its key {key_file} can't be read ({e})"
+                    for x in mine]
+            continue
+        out += [f"{x['id']}.json: the handle {handle} is reserved for key {key.id_text}" for x in mine
+                if _key_or_none(x["publicKey"]) != key]
+    return out
+
+
+def _key_or_none(text: str):
+    try:
+        return minisign.parse_public_key(text)
+    except minisign.MinisignError:
+        return None
+
+
+def _shared_repo_problems(listings: dict[str, dict]) -> list[str]:
+    handles: dict[str, set[str]] = {}
+    for listing in listings.values():
+        handles.setdefault(listing["repo"], set()).add(listing["author"])
+    return [f"{repo} is listed by more than one handle: {', '.join(sorted(h))}"
+            for repo, h in sorted(handles.items()) if len(h) > 1]
+
+
+def shared_repos(listings: dict[str, dict]) -> set[str]:
+    """Repositories that hold more than one listed plugin; their releases are tagged <id>-v<version>."""
+    seen, shared = set(), set()
+    for listing in listings.values():
+        (shared if listing["repo"] in seen else seen).add(listing["repo"])
+    return shared
 
 
 def _own_problems(path: Path, listing: dict) -> list[str]:

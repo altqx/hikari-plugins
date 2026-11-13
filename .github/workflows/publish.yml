@@ -39,6 +39,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
       - name: Publish
+        id: publish
         run: python -m registry publish --upload r2:hikari-marketplace
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -56,3 +57,9 @@ jobs:
             git pull --rebase origin main
             git push origin HEAD:main
           fi
+      - name: Tell the site
+        if: ${{ !cancelled() && steps.publish.outputs.index-serial != '' }}
+        run: python -m registry notify-site --serial "$SERIAL"
+        env:
+          SERIAL: ${{ steps.publish.outputs.index-serial }}
+          MARKETPLACE_DISPATCH_TOKEN: ${{ secrets.MARKETPLACE_DISPATCH_TOKEN }}

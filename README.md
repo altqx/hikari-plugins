@@ -19,7 +19,7 @@ The registry behind the [HikariSub plugin marketplace](https://marketplace.hikar
    }
    ```
 
-4. Publish a GitHub release with `<id>-<version>.hikariplugin` and `<id>-<version>.hikariplugin.minisig`. Within half an hour it's checked and published, and its release notes become its changelog. Drafts and pre-releases are skipped.
+4. Publish a GitHub release with `<id>-<version>.hikariplugin` and `<id>-<version>.hikariplugin.minisig`. Within half an hour it's checked and published, and its release notes become its changelog. Drafts and pre-releases are skipped. A repository can hold several of your plugins: give each its own listing, and tag each release `<id>-v<version>` (`alice.karaoke-tools-v1.2.0`), so CI knows which plugin it belongs to.
 
 Check a package before releasing it:
 
@@ -32,7 +32,7 @@ A release that fails is recorded and reported in an issue here; publish a new ve
 
 ## What CI checks
 
-- **Listings** ([schema](schemas/listing.schema.json)): the file is named after the id; the id's first segment is the author's handle; one handle has one key; one or two categories. On a pull request, CI lists what it changes for the reviewers: new handles, key changes and revocations. Removing a listing fails: versions are never deleted, only revoked.
+- **Listings** ([schema](schemas/listing.schema.json)): the file is named after the id; the id's first segment is the author's handle; one handle has one key; a repository belongs to one handle; one or two categories. The `hikarisub` handle is reserved for HikariSub's own plugins: a listing under it must use the key in [`keys/hikarisub.pub`](keys/hikarisub.pub) (C399EBCEA48BCB30). [`config/registry.json`](config/registry.json) names the reserved handles and their keys. On a pull request, CI lists what it changes for the reviewers: new handles, key changes and revocations. Removing a listing fails: versions are never deleted, only revoked.
 - **Releases:** the author's signature with the listing's key; the package rules of PL1 (paths, sizes, the manifest [schema](schemas/hikari-plugin.schema.json), the API number, the main file); the media rules (icon, screenshots, README), plus one of the registry's own: an SVG icon may not have a `<style>` element or a `style` attribute, only presentation attributes such as `fill`; the id against the listing and the handle; the version against the file name and the last published version; the marketplace's required fields.
 - **Permissions:** a version that asks for more than the last published one (a network host, a folder or writing to it, `documents.all`, the unrestricted tier) is held. CI opens a pull request adding `approvals/<id>/<version>.json` with the package's SHA-256; merging it publishes exactly those bytes. A plugin's first version is compared with nothing, so a first version with any permission is reviewed too.
 
@@ -54,6 +54,7 @@ A pull request to the listing:
 ## Keys and storage
 
 - **Signing:** CI signs `index.json` with the marketplace key, kept as the `MARKETPLACE_MINISIGN_KEY` and `MARKETPLACE_MINISIGN_PASSWORD` secrets. It refuses any key but [`keys/marketplace.pub`](keys/marketplace.pub), the key HikariSub pins. The owner holds the offline copy; no key lives in a Worker. Tests use a throwaway key ([`registry/testkey.py`](registry/testkey.py)) that nothing trusts.
+- **The site:** when Publish uploads a new `index.json`, it sends an `index-published` dispatch to [altqx/hikari-marketplace](https://github.com/altqx/hikari-marketplace), whose Deploy production rebuilds from the signed index. The dispatch uses the `MARKETPLACE_DISPATCH_TOKEN` secret, a token that can dispatch to that repository only. Without it, Publish says so, and the site is deployed by hand.
 - **Storage:** packages, media and the index go to the private Cloudflare R2 bucket `hikari-marketplace` through the `CLOUDFLARE_API_TOKEN` secret. The Worker that serves them at marketplace.hikarisub.org comes with the go-live. Running Publish by hand with “backfill” uploads any published version R2 lacks, fetched again from its release and checked against its SHA-256.
 
 ## Development

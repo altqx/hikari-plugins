@@ -11,15 +11,16 @@ from .publish import Asset, Release
 
 API = "https://api.github.com"
 REGISTRY = os.environ.get("GITHUB_REPOSITORY", "altqx/hikari-plugins")
+SITE = "altqx/hikari-marketplace"
 
 
 def _request(method: str, path: str, body: dict | None = None, accept: str = "application/vnd.github+json",
-             limit: int | None = None, auth: bool = True):
+             limit: int | None = None, auth: bool = True, token: str | None = None):
     url = path if path.startswith("https://") else f"{API}{path}"
     req = urllib.request.Request(url, method=method, data=json.dumps(body).encode() if body is not None else None)
     req.add_header("Accept", accept)
     req.add_header("X-GitHub-Api-Version", "2022-11-28")
-    if auth and (token := os.environ.get("GITHUB_TOKEN")):
+    if auth and (token := token or os.environ.get("GITHUB_TOKEN")):
         req.add_header("Authorization", f"Bearer {token}")
     with urllib.request.urlopen(req, timeout=60) as r:
         data = r.read(limit + 1) if limit else r.read()
@@ -35,7 +36,7 @@ def download(url: str, limit: int = 64 * 1024 * 1024 + 1) -> bytes:
 class GitHubSource:
     def releases(self, repo: str) -> list[Release]:
         out = []
-        for r in _request("GET", f"/repos/{repo}/releases?per_page=30"):
+        for r in _request("GET", f"/repos/{repo}/releases?per_page=100"):
             assets = {a["name"]: Asset(a["name"], a["size"], self._fetcher(a)) for a in r["assets"]}
             out.append(Release(r["tag_name"], r["html_url"], r.get("published_at") or "", r.get("body") or "", assets,
                                r["draft"], r["prerelease"]))
@@ -46,6 +47,12 @@ class GitHubSource:
         # The public download URL; the token must not follow its redirect to storage.
         return lambda: _request("GET", asset["browser_download_url"], accept="application/octet-stream",
                                 limit=asset["size"], auth=False)
+
+
+def dispatch_index_published(serial: int, token: str) -> None:
+    """Tells the site to rebuild from the new index; deploy-production.yml listens for index-published."""
+    _request("POST", f"/repos/{SITE}/dispatches",
+             {"event_type": "index-published", "client_payload": {"serial": serial}}, token=token)
 
 
 class GitHubReviewer:

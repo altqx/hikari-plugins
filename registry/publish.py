@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Protocol
 
 from . import minisign, package, permissions, semver
-from .listings import Config
+from .listings import Config, shared_repos
 
 MAX_CHANGELOG = 8 * 1024
 
@@ -75,12 +75,14 @@ def approval(root: Path, pid: str, version: str) -> dict | None:
     return json.loads(path.read_text()) if path.exists() else None
 
 
-def _candidate(listing: dict, release: Release) -> tuple[str, Asset, Asset] | None:
+def _candidate(listing: dict, release: Release, shared: bool) -> tuple[str, Asset, Asset] | None:
     prefix, suffix = f"{listing['id']}-", ".hikariplugin"
     for name, asset in release.assets.items():
         if name.startswith(prefix) and name.endswith(suffix):
             version = name[len(prefix):-len(suffix)]
             sig = release.assets.get(name + ".minisig")
+            if shared and release.tag != f"{listing['id']}-v{version}":
+                continue
             if semver.PATTERN.match(version) and sig:
                 return version, asset, sig
     return None
@@ -192,15 +194,18 @@ def backfill(root: Path, listings: dict[str, dict], config: Config, uploader, fe
 def run(root: Path, listings: dict[str, dict], config: Config, source: Source, uploader, reviewer: Reviewer,
         now: datetime) -> Report:
     report = Report()
+    shared = shared_repos(listings)
+    by_repo: dict[str, list[Release]] = {}
     for pid, listing in sorted(listings.items()):
         if "revoked" in listing:
             continue
         state = load_state(root, pid)
         known = {v["version"] for v in state["versions"]} | {r["version"] for r in state["refused"]}
         repo = listing["repo"].removeprefix("github.com/")
-        releases = [r for r in source.releases(repo) if not r.draft and not r.prerelease]
-        for release in sorted(releases, key=lambda r: r.published):
-            found = _candidate(listing, release)
+        if repo not in by_repo:
+            by_repo[repo] = [r for r in source.releases(repo) if not r.draft and not r.prerelease]
+        for release in sorted(by_repo[repo], key=lambda r: r.published):
+            found = _candidate(listing, release, listing["repo"] in shared)
             if not found or found[0] in known:
                 continue
             version, asset, sig_asset = found

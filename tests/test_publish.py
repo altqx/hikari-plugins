@@ -9,7 +9,9 @@ from pathlib import Path
 
 from registry import index, listings, minisign, publish, upload
 from registry.testkey import TEST_KEY
-from tests.fixtures import FakeReviewer, FakeSource, TempRoot, listing, package, release, signature
+from registry.publish import Asset, Release
+from tests.fixtures import (FakeReviewer, FakeSource, TempRoot, listing, package, release, signature,
+                            throwaway_key)
 
 NOW = datetime(2027, 1, 19, 10, 0, tzinfo=UTC)
 REPO = "alice/karaoke-flow"
@@ -216,6 +218,85 @@ class PublishTests(unittest.TestCase):
         self.run_once()
         schema = json.loads((Path(__file__).resolve().parent.parent / "schemas" / "index.schema.json").read_text())
         jsonschema.validate(self.index(), schema)
+
+
+OFFICIAL_REPO = "altqx/hikari-official-plugins"
+
+
+class OfficialRepoTests(unittest.TestCase):
+    """One repository, many plugins: releases are tagged <id>-v<version>."""
+
+    def setUp(self):
+        self.root = TempRoot()
+        self.out = tempfile.TemporaryDirectory()
+        self.uploader = upload.LocalUploader(Path(self.out.name))
+        self.source, self.reviewer = FakeSource(), FakeReviewer()
+        self.key = throwaway_key()
+        self.root.reserve("hikarisub", self.key)
+        for pid in ("hikarisub.macro-chains", "hikarisub.keyframes"):
+            self.root.add_listing(listing(pid=pid, author="hikarisub", publicKey=self.key.public.text,
+                                          repo=f"github.com/{OFFICIAL_REPO}"))
+
+    def tearDown(self):
+        self.root.cleanup()
+        self.out.cleanup()
+
+    def add(self, tag, pid, version, when):
+        data = package(version, pid=pid)
+        sig = minisign.sign(data, self.key, "timestamp:0").encode()
+        name = f"{pid}-{version}.hikariplugin"
+        assets = {name: Asset(name, len(data), lambda: data), name + ".minisig": Asset(name, len(sig), lambda: sig)}
+        self.source.add(OFFICIAL_REPO, Release(tag, f"https://github.com/{OFFICIAL_REPO}/releases/tag/{tag}", when,
+                                               "", assets))
+
+    def run_once(self):
+        current = listings.load_listings(self.root.path)
+        return publish.run(self.root.path, current, listings.load_config(self.root.path), self.source,
+                           self.uploader, self.reviewer, NOW)
+
+    def test_each_plugin_takes_only_its_own_tags(self):
+        self.add("hikarisub.macro-chains-v1.0.0", "hikarisub.macro-chains", "1.0.0", "2027-01-01")
+        self.add("hikarisub.keyframes-v0.1.0", "hikarisub.keyframes", "0.1.0", "2027-01-02")
+        self.add("hikarisub.macro-chains-v1.1.0", "hikarisub.macro-chains", "1.1.0", "2027-01-03")
+        report = self.run_once()
+        self.assertEqual(sorted(report.published), ["hikarisub.keyframes 0.1.0", "hikarisub.macro-chains 1.0.0",
+                                                    "hikarisub.macro-chains 1.1.0"])
+        self.assertEqual(report.refused, [])
+        self.assertEqual(self.source.asked, [OFFICIAL_REPO])
+        state = publish.load_state(self.root.path, "hikarisub.macro-chains")
+        self.assertEqual(state["versions"][0]["release"],
+                         f"https://github.com/{OFFICIAL_REPO}/releases/tag/hikarisub.macro-chains-v1.1.0")
+
+    def test_a_release_under_another_tag_is_left_alone(self):
+        self.add("v1.0.0", "hikarisub.macro-chains", "1.0.0", "2027-01-01")
+        self.add("hikarisub.keyframes-v1.0.0", "hikarisub.macro-chains", "1.0.0", "2027-01-02")
+        self.add("hikarisub.macro-chains-v1.0.1", "hikarisub.macro-chains", "1.0.0", "2027-01-03")
+        report = self.run_once()
+        self.assertEqual((report.published, report.refused, self.reviewer.refusals), ([], [], []))
+
+
+class PublishIndexTests(unittest.TestCase):
+    def setUp(self):
+        self.root = TempRoot()
+        self.out = tempfile.TemporaryDirectory()
+        self.uploader = upload.LocalUploader(Path(self.out.name))
+
+    def tearDown(self):
+        self.root.cleanup()
+        self.out.cleanup()
+
+    def publish_index(self):
+        import registry.__main__ as cli
+        from unittest import mock
+        config = listings.load_config(self.root.path)
+        with mock.patch.object(cli, "ROOT", self.root.path):
+            return cli.publish_index({}, [], config, self.uploader, TEST_KEY, NOW)
+
+    def test_the_serial_is_returned_only_when_a_new_index_was_uploaded(self):
+        self.assertEqual(self.publish_index(), 1)
+        self.assertIsNone(self.publish_index())
+        (Path(self.out.name) / "index.json").write_bytes(b"stale")
+        self.assertEqual(self.publish_index(), 1)
 
 
 if __name__ == "__main__":
