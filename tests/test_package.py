@@ -100,6 +100,19 @@ class PackageTests(unittest.TestCase):
         for field in ("summary", "icon", "screenshots"):
             self.assertIn(field, schema["properties"])
 
+    def test_fields_only_the_app_schema_had(self):
+        node = {"id": "glow", "title": "Glow", "file": "nodes/glow.lua",
+                "inputs": [{"name": "strength", "type": "Number", "default": 1}], "outputs": [{"name": "tags", "type": "Tags"}]}
+        restricted = manifest(permissions={"vcs.read": "Compares with a branch."},
+                              contributes={"panels": [{"id": "marks", "title": "Marks", "area": "left"}], "nodes": [node]})
+        opened(files_for(restricted, **{"nodes/glow.lua": b"tags = ''\n"}))
+        qml = manifest(tier="unrestricted", contributes={"panels": [{"id": "view", "title": "View", "qml": "view.qml"}]})
+        opened(files_for(qml, **{"view.qml": b"import QtQuick\nItem {}\n"}))
+
+    def test_a_qml_panel_needs_the_unrestricted_tier(self):
+        qml = manifest(contributes={"panels": [{"id": "view", "title": "View", "qml": "view.qml"}]})
+        self.refused(files_for(qml, **{"view.qml": b"import QtQuick\nItem {}\n"}), "manifest")
+
 
 if __name__ == "__main__":
     unittest.main()
