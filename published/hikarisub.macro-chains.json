@@ -1,0 +1,27 @@
+{
+  "id": "hikarisub.macro-chains",
+  "versions": [
+    {
+      "version": "1.0.0",
+      "sha256": "70638177ea03409df47f51dcfa418112ea0b9fa30ae1d1cfab6db2172f002a13",
+      "size": 18633,
+      "api": 1,
+      "tier": "restricted",
+      "name": "Macro chains",
+      "summary": "Records commands and Automation macros as a chain and runs it again as one undo step.",
+      "description": "Record a chain of HikariSub commands and Automation macros, with their dialog answers, and run it again as one undo step. Each dialog field can stay as recorded, be asked for when the chain runs, or be left out. Imports AegisubChain chains. Inspired by AegisubChain by arch1t3cht.",
+      "license": "MIT",
+      "homepage": "https://github.com/altqx/hikari-official-plugins/tree/main/plugins/macro-chains",
+      "authors": [
+        "altqx"
+      ],
+      "permissions": {},
+      "published": "2026-11-16T05:36:46Z",
+      "release": "https://github.com/altqx/hikari-official-plugins/releases/tag/hikarisub.macro-chains-v1.0.0",
+      "changelog": "- Record HikariSub commands and Automation macros, with their dialog answers, as a chain.\n- Run a chain as one undo step, with every Ask field in one dialog first, from the panel or one of five shortcut slots.\n- Edit each step's selection and each dialog field as Constant, Ask or Exclude.\n- Import AegisubChain chains, which learn their dialogs on their first run.\n- Needs a HikariSub whose plugins group their steps into one undo step; on an older one it loads and says to update.",
+      "readme": "p/hikarisub.macro-chains/1.0.0/README.md",
+      "icon": "p/hikarisub.macro-chains/1.0.0/icon.svg"
+    }
+  ],
+  "refused": []
+}
