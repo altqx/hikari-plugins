@@ -2,6 +2,27 @@
   "id": "hikarisub.keyframe-generator",
   "versions": [
     {
+      "version": "1.0.1",
+      "sha256": "1b157af3a5ebf8c3d1b3d55be3b1597d6b2ce7390e347baea730a48802a214a7",
+      "size": 6498,
+      "api": 1,
+      "tier": "restricted",
+      "name": "Keyframe generator",
+      "summary": "Finds the video's scene changes and makes keyframes from them.",
+      "description": "",
+      "license": "MIT",
+      "homepage": "https://github.com/altqx/hikari-official-plugins",
+      "authors": [
+        "altqx"
+      ],
+      "permissions": {},
+      "published": "2026-11-16T06:06:13Z",
+      "release": "https://github.com/altqx/hikari-official-plugins/releases/tag/hikarisub.keyframe-generator-v1.0.1",
+      "changelog": "- The README no longer names a minimum HikariSub version.",
+      "readme": "p/hikarisub.keyframe-generator/1.0.1/README.md",
+      "icon": "p/hikarisub.keyframe-generator/1.0.1/icon.svg"
+    },
+    {
       "version": "1.0.0",
       "sha256": "8b4957cf91f5ec18c7fd3f6d48ee745f709161664e636163b2b52af116a0d44e",
       "size": 6639,

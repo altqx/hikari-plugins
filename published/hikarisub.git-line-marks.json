@@ -2,6 +2,29 @@
   "id": "hikarisub.git-line-marks",
   "versions": [
     {
+      "version": "1.0.1",
+      "sha256": "4092684b09bcafa716e4a73b41150351355df871ea41ecebac5f9744d0be3cdf",
+      "size": 13207,
+      "api": 1,
+      "tier": "restricted",
+      "name": "Git line marks",
+      "summary": "Marks the Lines added, changed or removed since a git branch, tag or commit.",
+      "description": "Pick a branch, tag or commit, and the Grid marks each Line added, changed or removed since then, with a tooltip that names the change. Lines are matched as ASS Events, so a moved or retimed Line reads as changed. Marks refresh after each save and are never written into the file.",
+      "license": "MIT",
+      "homepage": "https://github.com/altqx/hikari-official-plugins/tree/main/plugins/git-line-marks",
+      "authors": [
+        "altqx"
+      ],
+      "permissions": {
+        "vcs.read": "Compares your subtitle file with the branch, tag or commit you pick, to mark the Lines that changed since then."
+      },
+      "published": "2026-11-16T06:06:13Z",
+      "release": "https://github.com/altqx/hikari-official-plugins/releases/tag/hikarisub.git-line-marks-v1.0.1",
+      "changelog": "- The README no longer names a minimum HikariSub version.",
+      "readme": "p/hikarisub.git-line-marks/1.0.1/README.md",
+      "icon": "p/hikarisub.git-line-marks/1.0.1/icon.svg"
+    },
+    {
       "version": "1.0.0",
       "sha256": "eb4847c1b887977183efed9d51b7b5aa1986169956f3c35def36312f82f098bc",
       "size": 13287,

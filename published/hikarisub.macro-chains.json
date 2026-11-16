@@ -2,6 +2,27 @@
   "id": "hikarisub.macro-chains",
   "versions": [
     {
+      "version": "1.0.1",
+      "sha256": "a7db8381f13eca57d5989dfaea7dd3e6a4fa078bc6bef9619c1dad9075de9f74",
+      "size": 18509,
+      "api": 1,
+      "tier": "restricted",
+      "name": "Macro chains",
+      "summary": "Records commands and Automation macros as a chain and runs it again as one undo step.",
+      "description": "Record a chain of HikariSub commands and Automation macros, with their dialog answers, and run it again as one undo step. Each dialog field can stay as recorded, be asked for when the chain runs, or be left out. Imports AegisubChain chains. Inspired by AegisubChain by arch1t3cht.",
+      "license": "MIT",
+      "homepage": "https://github.com/altqx/hikari-official-plugins/tree/main/plugins/macro-chains",
+      "authors": [
+        "altqx"
+      ],
+      "permissions": {},
+      "published": "2026-11-16T06:06:13Z",
+      "release": "https://github.com/altqx/hikari-official-plugins/releases/tag/hikarisub.macro-chains-v1.0.1",
+      "changelog": "- The README no longer names a minimum HikariSub version.",
+      "readme": "p/hikarisub.macro-chains/1.0.1/README.md",
+      "icon": "p/hikarisub.macro-chains/1.0.1/icon.svg"
+    },
+    {
       "version": "1.0.0",
       "sha256": "70638177ea03409df47f51dcfa418112ea0b9fa30ae1d1cfab6db2172f002a13",
       "size": 18633,
