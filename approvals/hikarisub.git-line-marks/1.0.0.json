@@ -1,0 +1,7 @@
+{
+  "sha256": "eb4847c1b887977183efed9d51b7b5aa1986169956f3c35def36312f82f098bc",
+  "release": "https://github.com/altqx/hikari-official-plugins/releases/tag/hikarisub.git-line-marks-v1.0.0",
+  "asks": [
+    "the git repository's branches, tags and history (vcs.read)"
+  ]
+}
