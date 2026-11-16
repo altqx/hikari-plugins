@@ -70,7 +70,7 @@ class PublishTests(unittest.TestCase):
         self.assertEqual(v["url"], "https://marketplace.hikarisub.org/p/alice.karaoke-flow/1.0.0.hikariplugin")
         self.assertEqual(v["screenshots"][0]["caption"], "The preset panel.")
         self.assertEqual(v["changelog"], "Notes for 1.0.0.")
-        self.assertEqual(idx["apiVersions"], {"1": "0.2.0"})
+        self.assertEqual(idx["apiVersions"], {"1": "0.1.0"})
 
     def test_a_bad_signature_is_refused(self):
         data = package("1.0.0")
