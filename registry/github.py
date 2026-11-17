@@ -1,12 +1,14 @@
 """GitHub as the release source and the place reviews and refusals go."""
 
 import base64
+import hashlib
 import json
 import os
 import urllib.error
 import urllib.parse
 import urllib.request
 
+from .package import MAX_PLATFORM_PACKAGE_BYTES
 from .publish import Asset, Release
 
 API = "https://api.github.com"
@@ -29,7 +31,7 @@ def _request(method: str, path: str, body: dict | None = None, accept: str = "ap
     return data if accept == "application/octet-stream" else json.loads(data or b"null")
 
 
-def download(url: str, limit: int = 64 * 1024 * 1024 + 1) -> bytes:
+def download(url: str, limit: int = MAX_PLATFORM_PACKAGE_BYTES + 1) -> bytes:
     return _request("GET", url, accept="application/octet-stream", limit=limit, auth=False)
 
 
@@ -41,6 +43,14 @@ class GitHubSource:
             out.append(Release(r["tag_name"], r["html_url"], r.get("published_at") or "", r.get("body") or "", assets,
                                r["draft"], r["prerelease"]))
         return out
+
+    def digest(self, url: str, limit: int) -> tuple[int, str]:
+        h, size = hashlib.sha256(), 0
+        with urllib.request.urlopen(urllib.request.Request(url), timeout=60) as r:
+            while size <= limit and (chunk := r.read(1 << 20)):
+                h.update(chunk)
+                size += len(chunk)
+        return size, h.hexdigest()
 
     @staticmethod
     def _fetcher(asset: dict):
