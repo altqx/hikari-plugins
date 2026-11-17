@@ -3,12 +3,27 @@
 import hashlib
 import json
 from datetime import datetime
+from functools import cache
 from pathlib import Path
+
+import jsonschema
 
 from . import minisign, semver
 from .listings import Config
 
 FORMAT = 1
+SCHEMA = Path(__file__).resolve().parent.parent / "schemas" / "index.schema.json"
+
+
+@cache
+def _validator():
+    return jsonschema.Draft202012Validator(json.loads(SCHEMA.read_text()))
+
+
+def problems(index: dict) -> list[str]:
+    """Where `index`, with or without format, breaks schemas/index.schema.json."""
+    return [f"{'/'.join(str(p) for p in e.path) or '(root)'}: {e.message}"
+            for e in _validator().iter_errors({"format": FORMAT, **index})]
 
 
 def build(listings: dict[str, dict], states: dict[str, dict], featured: list[str], config: Config) -> dict:
@@ -22,7 +37,11 @@ def build(listings: dict[str, dict], states: dict[str, dict], featured: list[str
         for v in sorted(state["versions"], key=lambda v: semver.key(v["version"]), reverse=True):
             out = {k: v[k] for k in ("version", "api", "tier", "name", "summary", "description", "license", "authors",
                                      "permissions", "sha256", "size", "published", "changelog") if k in v}
-            out["url"] = f"{config.base_url}/p/{pid}/{v['version']}.hikariplugin"
+            if "packages" in v:
+                out["packages"] = {p: {"url": f"{config.base_url}/p/{pid}/{v['version']}-{p}.hikariplugin", **x}
+                                   for p, x in v["packages"].items()}
+            else:
+                out["url"] = f"{config.base_url}/p/{pid}/{v['version']}.hikariplugin"
             if "homepage" in v:
                 out["homepage"] = v["homepage"]
             if "icon" in v:

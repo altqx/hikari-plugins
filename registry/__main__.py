@@ -49,6 +49,35 @@ def check_listings(args) -> int:
     return 1 if any(line.startswith("Removes") for line in lines) else 0
 
 
+def check_index(args) -> int:
+    """Builds index.json from the checked-in state, checks it against the schema, and compares it with the published one."""
+    current = listings.load_listings(ROOT)
+    featured = listings.load_featured(ROOT, current)
+    config = listings.load_config(ROOT)
+    states = {pid: publish.load_state(ROOT, pid) for pid in current}
+    body = index.build(current, states, featured, config)
+    last = json.loads((ROOT / "published" / "_index.json").read_text())
+    errors = index.problems({"serial": last["serial"], "generated": last["generated"], **body})
+    if errors:
+        _summary("The index breaks schemas/index.schema.json:\n" + "\n".join(f"- {e}" for e in errors))
+        return 1
+    count = sum(len(p["versions"]) for p in body["plugins"])
+    if args.packages:
+        from .github import download
+
+        try:
+            publish.recheck(current, states, config, download)
+        except (publish.Refused, package.PackageError) as e:
+            _summary(f"A published package fails today's checks: {e}")
+            return 1
+        _summary(f"All {count} published versions' packages pass today's checks.")
+    if index.content_hash(body) == last["sha256"]:
+        _summary(f"The index from {len(body['plugins'])} plugins and {count} versions is the published serial {last['serial']}, unchanged.")
+    else:
+        _summary(f"The index from {len(body['plugins'])} plugins and {count} versions differs from serial {last['serial']}; the next publish signs serial {last['serial'] + 1}.")
+    return 0
+
+
 def check_package(args) -> int:
     config = listings.load_config(ROOT)
     data = Path(args.package).read_bytes()
@@ -56,9 +85,12 @@ def check_package(args) -> int:
         if args.listing:
             listing = json.loads(Path(args.listing).read_text())
             version = Path(args.package).name.removeprefix(listing["id"] + "-").removesuffix(".hikariplugin")
-            publish.check_release(listing, version, data, Path(args.package + ".minisig").read_text(), None, config)
+            if m := publish._FOR_PLATFORM.fullmatch(version):
+                version, args.platform = m.group(1), m.group(2)
+            publish.check_release(listing, version, data, Path(args.package + ".minisig").read_text(), None, config,
+                                  args.platform)
         else:
-            package.open_package(data, config.newest_api)
+            package.open_package(data, config.newest_api, args.platform)
     except (publish.Refused, package.PackageError) as e:
         print(f"Refused: {e}")
         return 1
@@ -148,9 +180,13 @@ def main() -> int:
     p = sub.add_parser("check-listings", help="validate plugins/, featured.json and config/")
     p.add_argument("--base", help="git ref to compare with, to list what a PR changes")
     p.set_defaults(func=check_listings)
+    p = sub.add_parser("check-index", help="build index.json from the published state, check it, compare it with the last one")
+    p.add_argument("--packages", action="store_true", help="also download every published package and check it again")
+    p.set_defaults(func=check_index)
     p = sub.add_parser("check-package", help="run the automatic checks on a package before releasing it")
     p.add_argument("package")
     p.add_argument("--listing", help="your plugins/<id>.json; the .minisig must sit beside the package")
+    p.add_argument("--platform", help="a package built for this platform alone, such as linux-x64")
     p.set_defaults(func=check_package)
     p = sub.add_parser("publish", help="publish new releases and the signed index")
     p.add_argument("--upload", default="dry-run", help="dry-run, local:<folder> or r2:<bucket>")
