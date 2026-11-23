@@ -12,6 +12,17 @@ def increase(old: dict | None, new: dict) -> list[str]:
         out.append("every open document (documents.all)")
     if "vcs.read" in after and "vcs.read" not in before:
         out.append("the git repository's branches, tags and history (vcs.read)")
+    if "programs" in after and "programs" not in before:
+        out.append("running its programs")
+    old_programs = {p["id"]: p for p in programs(old or {})}
+    for p in programs(new):
+        was = old_programs.get(p["id"])
+        if was is None:
+            out.append(f"program {p['id']}" + (" with the internet" if p.get("network") else ""))
+        elif p.get("network") and not was.get("network"):
+            out.append(f"the internet for program {p['id']}")
+        if p.get("confinement") == "lowIntegrity" and (was or {}).get("confinement") != "lowIntegrity":
+            out.append(f"program {p['id']} at low integrity, which can read your files")
     old_hosts = set(before.get("network", {}).get("hosts", []))
     for host in after.get("network", {}).get("hosts", []):
         if host not in old_hosts:
@@ -24,3 +35,9 @@ def increase(old: dict | None, new: dict) -> list[str]:
         elif f.get("writable") and not was.get("writable"):
             out.append(f"writing to folder “{f['title']}”")
     return out
+
+
+def programs(manifest: dict) -> list[dict]:
+    """What review compares of each program: its id, network and confinement."""
+    found = manifest.get("programs") or manifest.get("contributes", {}).get("programs", [])
+    return [{k: p[k] for k in ("id", "network", "confinement") if k in p} for p in found]

@@ -2,7 +2,7 @@ import json
 import unittest
 
 from registry import package
-from tests.fixtures import SVG, files_for, jpeg, manifest, png, zip_bytes
+from tests.fixtures import PLATFORMS, SVG, files_for, jpeg, manifest, png, tool, with_tools, zip_bytes
 
 
 def opened(files, **kw):
@@ -112,6 +112,30 @@ class PackageTests(unittest.TestCase):
     def test_a_qml_panel_needs_the_unrestricted_tier(self):
         qml = manifest(contributes={"panels": [{"id": "view", "title": "View", "qml": "view.qml"}]})
         self.refused(files_for(qml, **{"view.qml": b"import QtQuick\nItem {}\n"}), "manifest")
+
+    def test_a_package_for_one_platform_may_hold_256_mib(self):
+        m = with_tools()
+        big = {**files_for(m), tool("linux-x64"): b"x", "data/big.bin": bytes(100 * 1024 * 1024)}
+        data = zip_bytes(big)
+        package.open_package(data, 1, "linux-x64")
+        with self.assertRaisesRegex(package.PackageError, "over 64 MiB unpacked"):
+            package.open_package(data, 1)
+        everything = {**big, tool("windows-x64"): b"x"}
+        with self.assertRaisesRegex(package.PackageError, "over 64 MiB unpacked"):
+            package.open_package(zip_bytes(everything), 1, "linux-x64")
+        with self.assertRaisesRegex(package.PackageError, "over 256 MiB unpacked"):
+            package.open_package(zip_bytes({**big, "data/more.bin": bytes(160 * 1024 * 1024)}), 1, "linux-x64")
+
+    def test_programs_need_their_permission_and_unique_ids(self):
+        m = with_tools()
+        tools = {tool(p): b"x" for p in PLATFORMS}
+        opened(files_for(m, **tools))
+        self.refused(files_for({**m, "permissions": {}}, **tools), "programs need permissions.programs")
+        twice = {**m, "contributes": {"programs": m["contributes"]["programs"] * 2}}
+        self.refused(files_for(twice, **tools), "two programs share an id")
+        half = {"url": "https://example.com/t.zip", "sha256": "0" * 64, "size": 1, "archive": "zip"}
+        download = {**m, "contributes": {"programs": [{"id": "t", "title": "T", "platforms": {"linux-x64": {"download": half}}}]}}
+        self.refused(files_for(download), "archive and entry come together")
 
 
 if __name__ == "__main__":

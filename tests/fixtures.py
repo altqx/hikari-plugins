@@ -1,3 +1,4 @@
+import hashlib
 import io
 import json
 import os
@@ -64,6 +65,7 @@ def zip_bytes(files: dict[str, bytes], symlink: str | None = None) -> bytes:
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
         for name, data in files.items():
             info = zipfile.ZipInfo(name, date_time=(2026, 11, 2, 0, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
             info.external_attr = (0o120777 if name == symlink else 0o100644) << 16
             z.writestr(info, data)
     return out.getvalue()
@@ -71,6 +73,24 @@ def zip_bytes(files: dict[str, bytes], symlink: str | None = None) -> bytes:
 
 def package(version="1.0.0", **extra) -> bytes:
     return zip_bytes(files_for(manifest(version, **extra)))
+
+
+PLATFORMS = ("linux-x64", "windows-x64")
+
+
+def tool(platform: str) -> str:
+    return f"bin/{platform}/tool"
+
+
+def with_tools(version="1.0.0", **extra) -> dict:
+    programs = [{"id": "tool", "title": "Tool", "platforms": {p: {"path": tool(p)} for p in PLATFORMS}}]
+    return manifest(version, permissions={"programs": "Runs the bundled tool."}, contributes={"programs": programs},
+                    **extra)
+
+
+def platform_package(m: dict, platform: str, **overrides) -> bytes:
+    """A package built for `platform` alone: the shared manifest and only that platform's tool."""
+    return zip_bytes(files_for(m, **{tool(platform): b"\x7fELF " + platform.encode(), **overrides}))
 
 
 def signature(data: bytes, signer="alice") -> bytes:
@@ -84,6 +104,17 @@ def release(version: str, data: bytes, sig: bytes, pid="alice.karaoke-flow", whe
                    when or f"2027-{version}", f"Notes for {version}.", assets, **flags)
 
 
+def platform_release(version: str, packages: dict[str, bytes], pid="alice.karaoke-flow", signer="alice") -> Release:
+    assets = {}
+    for platform, data in packages.items():
+        name = f"{pid}-{version}-{platform}.hikariplugin"
+        sig = signature(data, signer)
+        assets[name] = Asset(name, len(data), lambda data=data: data)
+        assets[name + ".minisig"] = Asset(name, len(sig), lambda sig=sig: sig)
+    return Release(f"v{version}", f"https://github.com/alice/karaoke-flow/releases/tag/v{version}", f"2027-{version}",
+                   f"Notes for {version}.", assets)
+
+
 def listing(pid="alice.karaoke-flow", author="alice", key="alice", **extra) -> dict:
     data = {"id": pid, "author": author, "authorName": "Alice", "repo": "github.com/alice/karaoke-flow",
             "publicKey": pub(key), "categories": ["Karaoke"]}
@@ -95,6 +126,7 @@ class FakeSource:
     def __init__(self):
         self.by_repo: dict[str, list[Release]] = {}
         self.asked: list[str] = []
+        self.served: dict[str, bytes] = {}
 
     def add(self, repo: str, rel: Release) -> None:
         self.by_repo.setdefault(repo, []).append(rel)
@@ -102,6 +134,12 @@ class FakeSource:
     def releases(self, repo: str) -> list[Release]:
         self.asked.append(repo)
         return list(self.by_repo.get(repo, []))
+
+    def digest(self, url: str, limit: int) -> tuple[int, str]:
+        if url not in self.served:
+            raise OSError("404")
+        data = self.served[url][:limit + 1]
+        return len(data), hashlib.sha256(data).hexdigest()
 
 
 class FakeReviewer:

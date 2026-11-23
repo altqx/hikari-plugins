@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -33,6 +34,9 @@ class Release:
 
 class Source(Protocol):
     def releases(self, repo: str) -> list[Release]: ...
+
+    def digest(self, url: str, limit: int) -> tuple[int, str]:
+        """Size and SHA-256 of what `url` serves, reading no more than `limit` + 1 bytes."""
 
 
 class Reviewer(Protocol):
@@ -75,31 +79,56 @@ def approval(root: Path, pid: str, version: str) -> dict | None:
     return json.loads(path.read_text()) if path.exists() else None
 
 
-def _candidate(listing: dict, release: Release, shared: bool) -> tuple[str, Asset, Asset] | None:
+Packages = dict[str | None, tuple[Asset, Asset]]
+_FOR_PLATFORM = re.compile(rf"(.+)-({package.PLATFORM.pattern})")
+
+
+def _candidate(listing: dict, release: Release, shared: bool) -> tuple[str, Packages] | None:
+    """The version and its signed packages: one under None, or one per platform."""
     prefix, suffix = f"{listing['id']}-", ".hikariplugin"
+    found: dict[str, Packages] = {}
     for name, asset in release.assets.items():
-        if name.startswith(prefix) and name.endswith(suffix):
-            version = name[len(prefix):-len(suffix)]
-            sig = release.assets.get(name + ".minisig")
-            if shared and release.tag != f"{listing['id']}-v{version}":
-                continue
-            if semver.PATTERN.match(version) and sig:
-                return version, asset, sig
-    return None
+        if not (name.startswith(prefix) and name.endswith(suffix)):
+            continue
+        version, platform = name[len(prefix):-len(suffix)], None
+        if m := _FOR_PLATFORM.fullmatch(version):
+            version, platform = m.group(1), m.group(2)
+        sig = release.assets.get(name + ".minisig")
+        if shared and release.tag != f"{listing['id']}-v{version}":
+            continue
+        if semver.PATTERN.match(version) and sig:
+            found.setdefault(version, {})[platform] = asset, sig
+    return next(iter(found.items()), None)
+
+
+def package_name(pid: str, version: str, platform: str | None) -> str:
+    return f"{pid}-{version}-{platform}.hikariplugin" if platform else f"{pid}-{version}.hikariplugin"
+
+
+def stored_package(pid: str, version: str, platform: str | None) -> str:
+    return f"p/{pid}/{version}-{platform}.hikariplugin" if platform else f"p/{pid}/{version}.hikariplugin"
+
+
+def release_digest(shas: dict[str | None, str]) -> str:
+    """The SHA-256 an approval names: the package's own, or one over every platform's."""
+    if list(shas) == [None]:
+        return shas[None]
+    return hashlib.sha256("".join(f"{p} {shas[p]}\n" for p in sorted(shas, key=lambda p: p or "")).encode()).hexdigest()
 
 
 def check_release(listing: dict, version: str, data: bytes, signature: str, previous: dict | None,
-                  config: Config) -> package.Package:
-    """Every automatic check. Raises Refused with the reasons."""
+                  config: Config, platform: str | None = None) -> package.Package:
+    """Every automatic check on one package. Raises Refused with the reasons."""
     key = minisign.parse_public_key(listing["publicKey"])
+    label = f"{platform}: " if platform else ""
     try:
         minisign.verify(data, signature, [key])
     except minisign.MinisignError as e:
-        raise Refused(f"signature: {e}") from e
+        raise Refused(f"{label}signature: {e}") from e
     try:
-        pkg = package.open_package(data, config.newest_api)
+        pkg = package.open_package(data, config.newest_api, platform)
     except package.PackageError as e:
-        raise Refused(str(e)) from e
+        raise Refused(f"{label}{e}") from e
     m = pkg.manifest
     reasons = []
     if m["id"] != listing["id"]:
@@ -122,6 +151,35 @@ def check_release(listing: dict, version: str, data: bytes, signature: str, prev
     return pkg
 
 
+def check_packages(listing: dict, version: str, packages: dict[str | None, tuple[bytes, str]], previous: dict | None,
+                   config: Config) -> package.Package:
+    """check_release on each package. Packages per platform must carry the same manifest, byte for byte."""
+    if None in packages and len(packages) > 1:
+        raise Refused("the release has one package for every platform and packages per platform; keep one kind")
+    checked = {p: check_release(listing, version, data, sig, previous, config, p)
+               for p, (data, sig) in sorted(packages.items(), key=lambda kv: kv[0] or "")}
+    first = next(iter(checked.values()))
+    for platform, pkg in checked.items():
+        if pkg.files[package.MANIFEST] != first.files[package.MANIFEST]:
+            raise Refused(f"{platform}: the manifest is not the same as {next(iter(checked))}'s")
+    return first
+
+
+def check_downloads(manifest: dict, source: Source) -> None:
+    """Fetches every program the manifest downloads and checks its size and SHA-256."""
+    for program in manifest.get("contributes", {}).get("programs", []):
+        for platform, run in sorted(program["platforms"].items()):
+            if not (download := run.get("download")):
+                continue
+            at = f"program {program['id']} on {platform}: {download['url']}"
+            try:
+                size, sha = source.digest(download["url"], download["size"])
+            except Exception as e:
+                raise Refused(f"{at} could not be fetched ({e})") from e
+            if size != download["size"] or sha != download["sha256"]:
+                raise Refused(f"{at} is not the declared file ({size} bytes, SHA-256 {sha})")
+
+
 def _ext(path: str) -> str:
     return path.rsplit(".", 1)[1]
 
@@ -138,23 +196,30 @@ def _media_entry(pid: str, version: str, pkg: package.Package) -> dict:
     return media
 
 
-def upload_files(pid: str, entry: dict, data: bytes, pkg: package.Package, uploader) -> None:
-    """The package and its media, at the keys the published entry names. Packages go last-but-index."""
+def upload_files(pid: str, entry: dict, packages: dict[str | None, bytes], pkg: package.Package, uploader) -> None:
+    """The packages and their media, at the keys the published entry names. Packages go last-but-index."""
     m = pkg.manifest
     if "icon" in entry:
         uploader.put(entry["icon"], pkg.files[m["icon"]], immutable=True)
     for shot, source in zip(entry.get("screenshots", []), m.get("screenshots", [])):
         uploader.put(shot["path"], pkg.files[source["path"]], immutable=True)
     uploader.put(entry["readme"], pkg.files[package.README], immutable=True)
-    uploader.put(f"p/{pid}/{entry['version']}.hikariplugin", data, immutable=True)
+    for platform, data in sorted(packages.items(), key=lambda kv: kv[0] or ""):
+        uploader.put(stored_package(pid, entry["version"], platform), data, immutable=True)
 
 
-def _publish(listing, version, release, data, pkg, sha, state, uploader, now) -> None:
+def _where(packages: dict[str | None, bytes]) -> dict:
+    """sha256 and size for one package, or packages with them per platform."""
+    if list(packages) == [None]:
+        return {"sha256": hashlib.sha256(packages[None]).hexdigest(), "size": len(packages[None])}
+    return {"packages": {p: {"sha256": hashlib.sha256(d).hexdigest(), "size": len(d)} for p, d in sorted(packages.items())}}
+
+
+def _publish(listing, version, release, packages, pkg, state, uploader, now) -> None:
     pid, m = listing["id"], pkg.manifest
     entry = {
         "version": version,
-        "sha256": sha,
-        "size": len(data),
+        **_where(packages),
         "api": m["api"],
         "tier": m.get("tier", "restricted"),
         "name": m["name"],
@@ -164,15 +229,44 @@ def _publish(listing, version, release, data, pkg, sha, state, uploader, now) ->
         "homepage": m.get("homepage"),
         "authors": m["authors"],
         "permissions": m.get("permissions", {}),
+        "programs": permissions.programs(m) or None,
         "published": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "release": release.url,
         "changelog": release.notes.strip()[:MAX_CHANGELOG],
         **_media_entry(pid, version, pkg),
     }
     entry = {k: v for k, v in entry.items() if v is not None}
-    upload_files(pid, entry, data, pkg, uploader)
+    upload_files(pid, entry, packages, pkg, uploader)
     state["versions"].insert(0, entry)
     state["versions"].sort(key=lambda v: semver.key(v["version"]), reverse=True)
+
+
+def _published_packages(pid: str, v: dict, fetch) -> dict[str | None, bytes]:
+    """A published version's packages, fetched from its release and checked against the published SHA-256s."""
+    shas = {p: x["sha256"] for p, x in v["packages"].items()} if "packages" in v else {None: v["sha256"]}
+    base = v["release"].replace("/releases/tag/", "/releases/download/")
+    out = {}
+    for platform, sha in shas.items():
+        data = fetch(f"{base}/{package_name(pid, v['version'], platform)}")
+        if hashlib.sha256(data).hexdigest() != sha:
+            raise Refused(f"{pid} {v['version']}: the release asset no longer matches what was published")
+        out[platform] = data
+    return out
+
+
+def _open_published(packages: dict[str | None, bytes], config: Config) -> package.Package:
+    opened = [package.open_package(data, config.newest_api, p) for p, data in sorted(packages.items(), key=lambda kv: kv[0] or "")]
+    return opened[0]
+
+
+def recheck(listings: dict[str, dict], states: dict[str, dict], config: Config, fetch) -> None:
+    """Opens every published package again with today's checks."""
+    for pid in sorted(listings):
+        for v in states[pid]["versions"]:
+            try:
+                _open_published(_published_packages(pid, v, fetch), config)
+            except package.PackageError as e:
+                raise package.PackageError(f"{pid} {v['version']}: {e}") from e
 
 
 def backfill(root: Path, listings: dict[str, dict], config: Config, uploader, fetch) -> int:
@@ -180,13 +274,11 @@ def backfill(root: Path, listings: dict[str, dict], config: Config, uploader, fe
     count = 0
     for pid in sorted(listings):
         for v in load_state(root, pid)["versions"]:
-            if uploader.get(f"p/{pid}/{v['version']}.hikariplugin") is not None:
+            platforms = v["packages"] if "packages" in v else [None]
+            if all(uploader.get(stored_package(pid, v["version"], p)) is not None for p in platforms):
                 continue
-            url = v["release"].replace("/releases/tag/", "/releases/download/") + f"/{pid}-{v['version']}.hikariplugin"
-            data = fetch(url)
-            if hashlib.sha256(data).hexdigest() != v["sha256"]:
-                raise Refused(f"{pid} {v['version']}: the release asset no longer matches what was published")
-            upload_files(pid, v, data, package.open_package(data, config.newest_api), uploader)
+            packages = _published_packages(pid, v, fetch)
+            upload_files(pid, v, packages, _open_published(packages, config), uploader)
             count += 1
     return count
 
@@ -208,18 +300,20 @@ def run(root: Path, listings: dict[str, dict], config: Config, source: Source, u
             found = _candidate(listing, release, listing["repo"] in shared)
             if not found or found[0] in known:
                 continue
-            version, asset, sig_asset = found
+            version, assets = found
             label = f"{pid} {version}"
-            if asset.size > package.MAX_PACKAGE_BYTES or sig_asset.size > minisign.MAX_SIGNATURE_BYTES:
+            if any(asset.size > (package.MAX_PLATFORM_PACKAGE_BYTES if p else package.MAX_PACKAGE_BYTES)
+                   or sig.size > minisign.MAX_SIGNATURE_BYTES for p, (asset, sig) in assets.items()):
                 reasons = ["the package or its signature is too large"]
-                pkg = data = None
+                pkg = packages = None
             else:
-                data = asset.fetch()
-                sha = hashlib.sha256(data).hexdigest()
+                fetched = {p: (asset.fetch(), sig.fetch().decode("utf-8", "replace")) for p, (asset, sig) in assets.items()}
+                packages = {p: data for p, (data, _) in fetched.items()}
+                sha = release_digest({p: hashlib.sha256(d).hexdigest() for p, d in packages.items()})
                 previous = state["versions"][0] if state["versions"] else None
                 try:
-                    pkg = check_release(listing, version, data, sig_asset.fetch().decode("utf-8", "replace"),
-                                        previous, config)
+                    pkg = check_packages(listing, version, fetched, previous, config)
+                    check_downloads(pkg.manifest, source)
                     reasons = []
                 except Refused as e:
                     pkg, reasons = None, [str(e)]
@@ -237,7 +331,7 @@ def run(root: Path, listings: dict[str, dict], config: Config, source: Source, u
                     reviewer.request_approval(pid, version, {"sha256": sha, "release": release.url, "asks": asks})
                     report.held.append(f"{label}: asks for {', '.join(asks)}")
                     continue
-            _publish(listing, version, release, data, pkg, sha, state, uploader, now)
+            _publish(listing, version, release, packages, pkg, state, uploader, now)
             save_state(root, state)
             known.add(version)
             report.published.append(label)
@@ -246,4 +340,4 @@ def run(root: Path, listings: dict[str, dict], config: Config, source: Source, u
 
 def _last_good_manifest(state: dict) -> dict | None:
     v = state["versions"][0] if state["versions"] else None
-    return {"tier": v["tier"], "permissions": v["permissions"]} if v else None
+    return {"tier": v["tier"], "permissions": v["permissions"], "programs": v.get("programs", [])} if v else None
