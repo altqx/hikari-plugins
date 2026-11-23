@@ -27,3 +27,5 @@ jobs:
           MINISIGN_SCRYPT_TEST: "1"
       - name: Listings
         run: python -m registry check-listings ${{ github.event_name == 'pull_request' && format('--base origin/{0}', github.base_ref) || '' }}
+      - name: Index and published packages
+        run: python -m registry check-index --packages

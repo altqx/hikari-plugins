@@ -1,17 +1,42 @@
 """GitHub as the release source and the place reviews and refusals go."""
 
 import base64
+import hashlib
 import json
 import os
 import urllib.error
 import urllib.parse
 import urllib.request
 
+from .package import MAX_PLATFORM_PACKAGE_BYTES
 from .publish import Asset, Release
 
 API = "https://api.github.com"
 REGISTRY = os.environ.get("GITHUB_REPOSITORY", "altqx/hikari-plugins")
 SITE = "altqx/hikari-marketplace"
+MAX_REDIRECTS = 5
+
+
+class HttpsRedirects(urllib.request.HTTPRedirectHandler):
+    """Follows at most MAX_REDIRECTS redirects, each to HTTPS, as HikariSub does for a program download."""
+
+    max_redirections = MAX_REDIRECTS
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        if urllib.parse.urlsplit(newurl).scheme != "https":
+            raise ValueError(f"{req.full_url} redirects off HTTPS, to {newurl}")
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+def https_opener() -> urllib.request.OpenerDirector:
+    return urllib.request.build_opener(HttpsRedirects)
+
+
+def open_https(url: str, timeout: int = 60):
+    """Opens an HTTPS URL with no cookies; a plain-HTTP URL or redirect is refused."""
+    if urllib.parse.urlsplit(url).scheme != "https":
+        raise ValueError(f"{url} isn't HTTPS")
+    return https_opener().open(urllib.request.Request(url), timeout=timeout)
 
 
 def _request(method: str, path: str, body: dict | None = None, accept: str = "application/vnd.github+json",
@@ -29,7 +54,7 @@ def _request(method: str, path: str, body: dict | None = None, accept: str = "ap
     return data if accept == "application/octet-stream" else json.loads(data or b"null")
 
 
-def download(url: str, limit: int = 64 * 1024 * 1024 + 1) -> bytes:
+def download(url: str, limit: int = MAX_PLATFORM_PACKAGE_BYTES + 1) -> bytes:
     return _request("GET", url, accept="application/octet-stream", limit=limit, auth=False)
 
 
@@ -41,6 +66,14 @@ class GitHubSource:
             out.append(Release(r["tag_name"], r["html_url"], r.get("published_at") or "", r.get("body") or "", assets,
                                r["draft"], r["prerelease"]))
         return out
+
+    def digest(self, url: str, limit: int) -> tuple[int, str]:
+        h, size = hashlib.sha256(), 0
+        with open_https(url) as r:
+            while size <= limit and (chunk := r.read(1 << 20)):
+                h.update(chunk)
+                size += len(chunk)
+        return size, h.hexdigest()
 
     @staticmethod
     def _fetcher(asset: dict):
