@@ -1,8 +1,10 @@
 import base64
+import email.message
 import io
 import json
 import unittest
 import urllib.error
+import urllib.request
 from unittest import mock
 
 from registry import github
@@ -126,3 +128,37 @@ class DispatchTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DownloadTests(unittest.TestCase):
+    def test_a_plain_http_url_is_refused(self):
+        with mock.patch("urllib.request.OpenerDirector.open") as opened:
+            with self.assertRaisesRegex(ValueError, "isn't HTTPS"):
+                github.GitHubSource().digest("http://example.com/tool.tar.gz", 10)
+        opened.assert_not_called()
+
+    def test_a_redirect_off_https_is_refused(self):
+        req = urllib.request.Request("https://example.com/tool.tar.gz")
+        with self.assertRaisesRegex(ValueError, "redirects off HTTPS"):
+            github.HttpsRedirects().redirect_request(req, None, 302, "Found", email.message.Message(),
+                                                     "http://example.com/tool.tar.gz")
+
+    def test_a_sixth_redirect_is_refused(self):
+        req = urllib.request.Request("https://example.com/5")
+        req.redirect_dict = {f"https://example.com/{i}": 1 for i in range(github.MAX_REDIRECTS)}
+        headers = email.message.Message()
+        headers["Location"] = "https://example.com/6"
+        handler = github.HttpsRedirects()
+        handler.parent = urllib.request.build_opener()
+        with self.assertRaises(urllib.error.HTTPError) as refused:
+            handler.http_error_302(req, io.BytesIO(), 302, "Found", headers)
+        refused.exception.close()
+
+    def test_redirects_on_https_are_followed_without_cookies(self):
+        req = urllib.request.Request("https://example.com/tool.tar.gz")
+        followed = github.HttpsRedirects().redirect_request(req, None, 302, "Found", email.message.Message(),
+                                                            "https://objects.example.net/tool.tar.gz")
+        self.assertEqual(followed.full_url, "https://objects.example.net/tool.tar.gz")
+        handlers = github.https_opener().handlers
+        self.assertTrue(any(isinstance(h, github.HttpsRedirects) for h in handlers))
+        self.assertFalse(any(isinstance(h, urllib.request.HTTPCookieProcessor) for h in handlers))

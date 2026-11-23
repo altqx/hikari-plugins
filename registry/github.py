@@ -14,6 +14,29 @@ from .publish import Asset, Release
 API = "https://api.github.com"
 REGISTRY = os.environ.get("GITHUB_REPOSITORY", "altqx/hikari-plugins")
 SITE = "altqx/hikari-marketplace"
+MAX_REDIRECTS = 5
+
+
+class HttpsRedirects(urllib.request.HTTPRedirectHandler):
+    """Follows at most MAX_REDIRECTS redirects, each to HTTPS, as HikariSub does for a program download."""
+
+    max_redirections = MAX_REDIRECTS
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        if urllib.parse.urlsplit(newurl).scheme != "https":
+            raise ValueError(f"{req.full_url} redirects off HTTPS, to {newurl}")
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+def https_opener() -> urllib.request.OpenerDirector:
+    return urllib.request.build_opener(HttpsRedirects)
+
+
+def open_https(url: str, timeout: int = 60):
+    """Opens an HTTPS URL with no cookies; a plain-HTTP URL or redirect is refused."""
+    if urllib.parse.urlsplit(url).scheme != "https":
+        raise ValueError(f"{url} isn't HTTPS")
+    return https_opener().open(urllib.request.Request(url), timeout=timeout)
 
 
 def _request(method: str, path: str, body: dict | None = None, accept: str = "application/vnd.github+json",
@@ -46,7 +69,7 @@ class GitHubSource:
 
     def digest(self, url: str, limit: int) -> tuple[int, str]:
         h, size = hashlib.sha256(), 0
-        with urllib.request.urlopen(urllib.request.Request(url), timeout=60) as r:
+        with open_https(url) as r:
             while size <= limit and (chunk := r.read(1 << 20)):
                 h.update(chunk)
                 size += len(chunk)
