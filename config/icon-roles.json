@@ -1,5 +1,5 @@
 {
-  "description": "HikariSub's icon roles (altqx/hikari src/ui/icons/manifest.json, main 25d7d44d9): an icon theme holds <role>.svg for each.",
+  "description": "HikariSub's icon roles (altqx/hikari src/ui/icons/manifest.json, main 048d54e22): an icon theme holds <role>.svg for each.",
   "roles": [
     "open-subtitles",
     "save",

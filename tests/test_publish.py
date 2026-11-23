@@ -10,8 +10,9 @@ from pathlib import Path
 from registry import index, listings, minisign, publish, upload
 from registry.testkey import TEST_KEY
 from registry.publish import Asset, Release
-from tests.fixtures import (FakeReviewer, FakeSource, TempRoot, listing, package, release, signature,
-                            throwaway_key)
+from tests.fixtures import (PLATFORMS, FakeReviewer, FakeSource, TempRoot, files_for, listing, manifest, package,
+                            platform_package, platform_release, release, signature, throwaway_key, tool, with_tools,
+                            zip_bytes)
 
 NOW = datetime(2027, 1, 19, 10, 0, tzinfo=UTC)
 REPO = "alice/karaoke-flow"
@@ -218,6 +219,110 @@ class PublishTests(unittest.TestCase):
         self.run_once()
         schema = json.loads((Path(__file__).resolve().parent.parent / "schemas" / "index.schema.json").read_text())
         jsonschema.validate(self.index(), schema)
+        self.assertEqual(index.problems(self.index()), [])
+
+    def add_per_platform(self, version="1.0.0", m=None, **packages):
+        m = m or with_tools(version)
+        packages = packages or {p: platform_package(m, p) for p in PLATFORMS}
+        self.source.add(REPO, platform_release(version, packages))
+        return packages
+
+    def approve_programs(self, version="1.0.0"):
+        """A first version asking for programs is held; approve what was reviewed and run again."""
+        report = self.run_once()
+        self.assertEqual(report.held, [f"alice.karaoke-flow {version}: asks for running its programs, program tool"])
+        pid, version, record = self.reviewer.approvals[-1]
+        self.root.approve(pid, version, record)
+        return self.run_once()
+
+    def test_packages_per_platform_are_published_under_packages(self):
+        packages = self.add_per_platform()
+        self.assertEqual(self.approve_programs().published, ["alice.karaoke-flow 1.0.0"])
+        v = self.index()["plugins"][0]["versions"][0]
+        self.assertNotIn("url", v)
+        self.assertEqual(set(v["packages"]), set(PLATFORMS))
+        for platform, data in packages.items():
+            self.assertEqual(v["packages"][platform], {
+                "url": f"https://marketplace.hikarisub.org/p/alice.karaoke-flow/1.0.0-{platform}.hikariplugin",
+                "sha256": hashlib.sha256(data).hexdigest(), "size": len(data)})
+            self.assertEqual((self.site / f"p/alice.karaoke-flow/1.0.0-{platform}.hikariplugin").read_bytes(), data)
+        self.assertEqual(index.problems(self.index()), [])
+        record = self.reviewer.approvals[0][2]
+        self.assertEqual(record["sha256"], publish.release_digest(
+            {p: hashlib.sha256(d).hexdigest() for p, d in packages.items()}))
+
+    def test_packages_per_platform_carry_the_same_manifest(self):
+        m = with_tools()
+        self.add_per_platform(**{"linux-x64": platform_package(m, "linux-x64"),
+                                 "windows-x64": platform_package(with_tools(description="Other."), "windows-x64")})
+        self.assertIn("windows-x64: the manifest is not the same as linux-x64's", self.run_once().refused[0])
+
+    def test_a_release_has_one_kind_of_package(self):
+        m = with_tools()
+        both = platform_release("1.0.0", {"linux-x64": platform_package(m, "linux-x64")})
+        whole = zip_bytes(files_for(m, **{tool(p): b"x" for p in PLATFORMS}))
+        both.assets.update(release("1.0.0", whole, signature(whole)).assets)
+        self.source.add(REPO, both)
+        self.assertIn("keep one kind", self.run_once().refused[0])
+
+    def test_a_platforms_own_program_must_be_in_its_package(self):
+        m = with_tools()
+        self.add_per_platform(**{"linux-x64": platform_package(m, "windows-x64")})
+        self.assertIn("bin/linux-x64/tool: program tool on linux-x64 is not in the package", self.run_once().refused[0])
+
+    def test_a_package_for_every_platform_holds_every_program(self):
+        m = with_tools()
+        data = platform_package(m, "linux-x64")
+        self.add("1.0.0", data=data)
+        self.assertIn("bin/windows-x64/tool: program tool on windows-x64", self.run_once().refused[0])
+
+    def test_program_downloads_are_fetched_and_checked(self):
+        url = "https://example.com/tool-linux.tar.gz"
+        served = b"the tool"
+        run = {"download": {"url": url, "sha256": hashlib.sha256(served).hexdigest(), "size": len(served),
+                            "archive": "tar.gz", "entry": "tool"}}
+        m = manifest(permissions={"programs": "Runs the tool."},
+                     contributes={"programs": [{"id": "tool", "title": "Tool", "platforms": {"linux-x64": run}}]})
+        self.add("1.0.0", data=zip_bytes(files_for(m)))
+        self.assertIn(f"{url} could not be fetched", self.run_once().refused[0])
+
+        self.source.served[url] = b"not the tool"
+        self.add("1.0.1", data=zip_bytes(files_for({**m, "version": "1.0.1"})))
+        self.assertIn(f"{url} is not the declared file", self.run_once().refused[0])
+
+        self.source.served[url] = served
+        self.add("1.0.2", data=zip_bytes(files_for({**m, "version": "1.0.2"})))
+        self.assertEqual(self.approve_programs("1.0.2").published, ["alice.karaoke-flow 1.0.2"])
+
+    def test_a_program_that_gains_the_internet_is_reviewed(self):
+        self.add_per_platform()
+        self.approve_programs()
+        m = with_tools("1.1.0")
+        m["contributes"]["programs"][0]["network"] = True
+        self.add_per_platform("1.1.0", m)
+        self.assertEqual(self.run_once().held, ["alice.karaoke-flow 1.1.0: asks for the internet for program tool"])
+
+    def test_backfill_and_recheck_take_every_platforms_package(self):
+        packages = self.add_per_platform()
+        self.approve_programs()
+        fresh = upload.LocalUploader(self.site / "fresh")
+        fetched = []
+
+        def fetch(url):
+            fetched.append(url)
+            return next(d for p, d in packages.items() if url.endswith(f"-{p}.hikariplugin"))
+
+        current = listings.load_listings(self.root.path)
+        config = listings.load_config(self.root.path)
+        self.assertEqual(publish.backfill(self.root.path, current, config, fresh, fetch), 1)
+        for platform in PLATFORMS:
+            self.assertTrue((self.site / f"fresh/p/alice.karaoke-flow/1.0.0-{platform}.hikariplugin").exists())
+        self.assertIn("https://github.com/alice/karaoke-flow/releases/download/v1.0.0/"
+                      "alice.karaoke-flow-1.0.0-windows-x64.hikariplugin", fetched)
+        states = {pid: publish.load_state(self.root.path, pid) for pid in current}
+        publish.recheck(current, states, config, fetch)
+        with self.assertRaisesRegex(publish.Refused, "no longer matches"):
+            publish.recheck(current, states, config, lambda url: b"changed")
 
 
 OFFICIAL_REPO = "altqx/hikari-official-plugins"

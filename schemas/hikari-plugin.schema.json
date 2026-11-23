@@ -2,31 +2,19 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://hikarisub.altqx.com/schemas/hikari-plugin.schema.json",
   "title": "HikariSub plugin manifest (hikari-plugin.json)",
-  "description": "HikariSub's manifest schema (altqx/hikari docs/schemas/hikari-plugin.schema.json, main 25d7d44d9), with the registry's own rule for SVG icons added to icon's description.",
+  "description": "HikariSub's manifest schema (altqx/hikari docs/schemas/hikari-plugin.schema.json, main b364de77e), with the registry's own rule for SVG icons added to icon's description.",
   "type": "object",
-  "required": [
-    "id",
-    "name",
-    "version",
-    "api",
-    "authors"
-  ],
+  "required": ["id", "name", "version", "api", "authors"],
   "additionalProperties": false,
   "properties": {
-    "$schema": {
-      "type": "string"
-    },
+    "$schema": {"type": "string"},
     "id": {
       "description": "Reverse-DNS, lowercase, at least two parts: com.example.line-tools.",
       "type": "string",
       "maxLength": 100,
       "pattern": "^[a-z0-9]+(-[a-z0-9]+)*(\\.[a-z0-9]+(-[a-z0-9]+)*)+$"
     },
-    "name": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 80
-    },
+    "name": {"type": "string", "minLength": 1, "maxLength": 80},
     "version": {
       "description": "Semantic version 2.0.0.",
       "type": "string",
@@ -41,54 +29,24 @@
     "main": {
       "description": "The plugin's code: a Lua file the helper runs, or a program from contributes.programs that speaks the plugin protocol over JSON-RPC. Without main the package runs no code of its own.",
       "oneOf": [
-        {
-          "$ref": "#/$defs/PackagePath"
-        },
+        {"$ref": "#/$defs/PackagePath"},
         {
           "type": "object",
-          "required": [
-            "program"
-          ],
+          "required": ["program"],
           "additionalProperties": false,
-          "properties": {
-            "program": {
-              "$ref": "#/$defs/LocalId"
-            }
-          }
+          "properties": {"program": {"$ref": "#/$defs/LocalId"}}
         }
       ]
     },
     "tier": {
       "description": "restricted runs without ffi, io, os and debug; unrestricted needs the user's full trust.",
-      "enum": [
-        "restricted",
-        "unrestricted"
-      ],
+      "enum": ["restricted", "unrestricted"],
       "default": "restricted"
     },
-    "authors": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 200
-      }
-    },
-    "description": {
-      "type": "string",
-      "maxLength": 1000
-    },
-    "license": {
-      "description": "An SPDX expression.",
-      "type": "string",
-      "maxLength": 200
-    },
-    "homepage": {
-      "type": "string",
-      "maxLength": 500,
-      "pattern": "^https://"
-    },
+    "authors": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1, "maxLength": 200}},
+    "description": {"type": "string", "maxLength": 1000},
+    "license": {"description": "An SPDX expression.", "type": "string", "maxLength": 200},
+    "homepage": {"type": "string", "maxLength": 500, "pattern": "^https://"},
     "summary": {
       "description": "One line for the marketplace's cards and the plugin page.",
       "type": "string",
@@ -106,15 +64,10 @@
       "maxItems": 6,
       "items": {
         "type": "object",
-        "required": [
-          "path",
-          "caption"
-        ],
+        "required": ["path", "caption"],
         "additionalProperties": false,
         "properties": {
-          "path": {
-            "$ref": "#/$defs/ScreenshotPath"
-          },
+          "path": {"$ref": "#/$defs/ScreenshotPath"},
           "caption": {
             "description": "Shown under the image and used as its alt text.",
             "type": "string",
@@ -140,23 +93,11 @@
         },
         "network": {
           "type": "object",
-          "required": [
-            "hosts",
-            "reason"
-          ],
+          "required": ["hosts", "reason"],
           "additionalProperties": false,
           "properties": {
-            "hosts": {
-              "type": "array",
-              "minItems": 1,
-              "maxItems": 32,
-              "items": {
-                "$ref": "#/$defs/Host"
-              }
-            },
-            "reason": {
-              "$ref": "#/$defs/Reason"
-            }
+            "hosts": {"type": "array", "minItems": 1, "maxItems": 32, "items": {"$ref": "#/$defs/Host"}},
+            "reason": {"$ref": "#/$defs/Reason"}
           }
         },
         "files": {
@@ -165,26 +106,13 @@
           "maxItems": 16,
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "title",
-              "reason"
-            ],
+            "required": ["id", "title", "reason"],
             "additionalProperties": false,
             "properties": {
-              "id": {
-                "$ref": "#/$defs/LocalId"
-              },
-              "title": {
-                "$ref": "#/$defs/Title"
-              },
-              "writable": {
-                "type": "boolean",
-                "default": false
-              },
-              "reason": {
-                "$ref": "#/$defs/Reason"
-              }
+              "id": {"$ref": "#/$defs/LocalId"},
+              "title": {"$ref": "#/$defs/Title"},
+              "writable": {"type": "boolean", "default": false},
+              "reason": {"$ref": "#/$defs/Reason"}
             }
           }
         },
@@ -215,28 +143,17 @@
           "maxItems": 256,
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "title"
-            ],
+            "required": ["id", "title"],
             "additionalProperties": false,
             "properties": {
-              "id": {
-                "$ref": "#/$defs/LocalId"
-              },
-              "title": {
-                "$ref": "#/$defs/Title"
-              },
+              "id": {"$ref": "#/$defs/LocalId"},
+              "title": {"$ref": "#/$defs/Title"},
               "description": {
                 "description": "One line for the command palette and, with aiTools, the AI.",
                 "$ref": "#/$defs/Summary"
               },
-              "icon": {
-                "$ref": "#/$defs/IconRef"
-              },
-              "when": {
-                "$ref": "#/$defs/Conditions"
-              },
+              "icon": {"$ref": "#/$defs/IconRef"},
+              "when": {"$ref": "#/$defs/Conditions"},
               "palette": {
                 "description": "false keeps the command out of the command palette, for one only a status item, a menu or the AI runs.",
                 "type": "boolean",
@@ -250,88 +167,40 @@
           "maxItems": 32,
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "title"
-            ],
+            "required": ["id", "title"],
             "additionalProperties": false,
             "properties": {
-              "id": {
-                "$ref": "#/$defs/LocalId"
-              },
-              "title": {
-                "$ref": "#/$defs/Title"
-              },
+              "id": {"$ref": "#/$defs/LocalId"},
+              "title": {"$ref": "#/$defs/Title"},
               "area": {
                 "description": "Where the panel docks the first time it is shown.",
-                "enum": [
-                  "left",
-                  "right",
-                  "bottom"
-                ],
+                "enum": ["left", "right", "bottom"],
                 "default": "right"
               },
               "qml": {
                 "description": "Full trust only: the panel is this QML file in the package instead of a widget tree.",
                 "$ref": "#/$defs/QmlPath"
               },
-              "icon": {
-                "$ref": "#/$defs/IconRef"
-              }
+              "icon": {"$ref": "#/$defs/IconRef"}
             }
           }
         },
-        "settings": {
-          "type": "array",
-          "maxItems": 256,
-          "items": {
-            "$ref": "#/$defs/Setting"
-          }
-        },
+        "settings": {"type": "array", "maxItems": 256, "items": {"$ref": "#/$defs/Setting"}},
         "nodes": {
           "description": "Lua nodes for node effects, run in the node sandbox like a Lua node.",
           "type": "array",
           "maxItems": 64,
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "title",
-              "file",
-              "outputs"
-            ],
+            "required": ["id", "title", "file", "outputs"],
             "additionalProperties": false,
             "properties": {
-              "id": {
-                "$ref": "#/$defs/LocalId"
-              },
-              "title": {
-                "$ref": "#/$defs/Title"
-              },
-              "summary": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 300
-              },
-              "file": {
-                "description": "The node's Lua code, a file in the package.",
-                "$ref": "#/$defs/PackagePath"
-              },
-              "inputs": {
-                "type": "array",
-                "maxItems": 32,
-                "items": {
-                  "$ref": "#/$defs/NodeInput"
-                }
-              },
-              "outputs": {
-                "type": "array",
-                "minItems": 1,
-                "maxItems": 32,
-                "items": {
-                  "$ref": "#/$defs/NodePort"
-                }
-              }
+              "id": {"$ref": "#/$defs/LocalId"},
+              "title": {"$ref": "#/$defs/Title"},
+              "summary": {"type": "string", "minLength": 1, "maxLength": 300},
+              "file": {"description": "The node's Lua code, a file in the package.", "$ref": "#/$defs/PackagePath"},
+              "inputs": {"type": "array", "maxItems": 32, "items": {"$ref": "#/$defs/NodeInput"}},
+              "outputs": {"type": "array", "minItems": 1, "maxItems": 32, "items": {"$ref": "#/$defs/NodePort"}}
             }
           }
         },
@@ -341,28 +210,14 @@
           "maxItems": 32,
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "title",
-              "type",
-              "path"
-            ],
+            "required": ["id", "title", "type", "path"],
             "additionalProperties": false,
             "properties": {
-              "id": {
-                "$ref": "#/$defs/LocalId"
-              },
-              "title": {
-                "$ref": "#/$defs/Title"
-              },
+              "id": {"$ref": "#/$defs/LocalId"},
+              "title": {"$ref": "#/$defs/Title"},
               "type": {
                 "description": "The theme file's own type, repeated so the theme can be listed without reading it.",
-                "enum": [
-                  "light",
-                  "dark",
-                  "highContrastLight",
-                  "highContrastDark"
-                ]
+                "enum": ["light", "dark", "highContrastLight", "highContrastDark"]
               },
               "path": {
                 "description": "A theme file in the package, checked against hikari-theme.schema.json.",
@@ -377,19 +232,11 @@
           "maxItems": 8,
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "title",
-              "path"
-            ],
+            "required": ["id", "title", "path"],
             "additionalProperties": false,
             "properties": {
-              "id": {
-                "$ref": "#/$defs/LocalId"
-              },
-              "title": {
-                "$ref": "#/$defs/Title"
-              },
+              "id": {"$ref": "#/$defs/LocalId"},
+              "title": {"$ref": "#/$defs/Title"},
               "path": {
                 "description": "A package folder holding <role>.svg for every icon role.",
                 "$ref": "#/$defs/FolderPath"
@@ -403,19 +250,9 @@
           "maxItems": 256,
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "path"
-            ],
+            "required": ["id", "path"],
             "additionalProperties": false,
-            "properties": {
-              "id": {
-                "$ref": "#/$defs/LocalId"
-              },
-              "path": {
-                "$ref": "#/$defs/SvgPath"
-              }
-            }
+            "properties": {"id": {"$ref": "#/$defs/LocalId"}, "path": {"$ref": "#/$defs/SvgPath"}}
           }
         },
         "styles": {
@@ -424,22 +261,12 @@
           "maxItems": 64,
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "title",
-              "path"
-            ],
+            "required": ["id", "title", "path"],
             "additionalProperties": false,
             "properties": {
-              "id": {
-                "$ref": "#/$defs/LocalId"
-              },
-              "title": {
-                "$ref": "#/$defs/Title"
-              },
-              "path": {
-                "$ref": "#/$defs/StylesPath"
-              }
+              "id": {"$ref": "#/$defs/LocalId"},
+              "title": {"$ref": "#/$defs/Title"},
+              "path": {"$ref": "#/$defs/StylesPath"}
             }
           }
         },
@@ -449,19 +276,9 @@
           "maxItems": 256,
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "path"
-            ],
+            "required": ["id", "path"],
             "additionalProperties": false,
-            "properties": {
-              "id": {
-                "$ref": "#/$defs/LocalId"
-              },
-              "path": {
-                "$ref": "#/$defs/KaraokePresetPath"
-              }
-            }
+            "properties": {"id": {"$ref": "#/$defs/LocalId"}, "path": {"$ref": "#/$defs/KaraokePresetPath"}}
           }
         },
         "graphs": {
@@ -470,22 +287,12 @@
           "maxItems": 256,
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "title",
-              "path"
-            ],
+            "required": ["id", "title", "path"],
             "additionalProperties": false,
             "properties": {
-              "id": {
-                "$ref": "#/$defs/LocalId"
-              },
-              "title": {
-                "$ref": "#/$defs/Title"
-              },
-              "path": {
-                "$ref": "#/$defs/GraphPath"
-              }
+              "id": {"$ref": "#/$defs/LocalId"},
+              "title": {"$ref": "#/$defs/Title"},
+              "path": {"$ref": "#/$defs/GraphPath"}
             }
           }
         },
@@ -495,22 +302,12 @@
           "maxItems": 512,
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "title",
-              "insert"
-            ],
+            "required": ["id", "title", "insert"],
             "additionalProperties": false,
             "properties": {
-              "id": {
-                "$ref": "#/$defs/LocalId"
-              },
-              "title": {
-                "$ref": "#/$defs/Title"
-              },
-              "description": {
-                "$ref": "#/$defs/Summary"
-              },
+              "id": {"$ref": "#/$defs/LocalId"},
+              "title": {"$ref": "#/$defs/Title"},
+              "description": {"$ref": "#/$defs/Summary"},
               "prefix": {
                 "description": "What the user types for the line editor to offer the snippet, such as \\fad.",
                 "type": "string",
@@ -533,12 +330,7 @@
           "maxItems": 32,
           "items": {
             "type": "object",
-            "required": [
-              "language",
-              "title",
-              "aff",
-              "dic"
-            ],
+            "required": ["language", "title", "aff", "dic"],
             "additionalProperties": false,
             "properties": {
               "language": {
@@ -547,15 +339,9 @@
                 "pattern": "^[A-Za-z0-9]+([_-][A-Za-z0-9]+)*$",
                 "maxLength": 32
               },
-              "title": {
-                "$ref": "#/$defs/Title"
-              },
-              "aff": {
-                "$ref": "#/$defs/AffPath"
-              },
-              "dic": {
-                "$ref": "#/$defs/DicPath"
-              }
+              "title": {"$ref": "#/$defs/Title"},
+              "aff": {"$ref": "#/$defs/AffPath"},
+              "dic": {"$ref": "#/$defs/DicPath"}
             }
           }
         },
@@ -565,22 +351,12 @@
           "maxItems": 32,
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "title",
-              "path"
-            ],
+            "required": ["id", "title", "path"],
             "additionalProperties": false,
             "properties": {
-              "id": {
-                "$ref": "#/$defs/LocalId"
-              },
-              "title": {
-                "$ref": "#/$defs/Title"
-              },
-              "path": {
-                "$ref": "#/$defs/LayoutPath"
-              }
+              "id": {"$ref": "#/$defs/LocalId"},
+              "title": {"$ref": "#/$defs/Title"},
+              "path": {"$ref": "#/$defs/LayoutPath"}
             }
           }
         },
@@ -590,19 +366,11 @@
           "maxItems": 256,
           "items": {
             "type": "object",
-            "required": [
-              "command",
-              "location"
-            ],
+            "required": ["command", "location"],
             "additionalProperties": false,
             "properties": {
-              "command": {
-                "description": "A command from contributes.commands.",
-                "$ref": "#/$defs/LocalId"
-              },
-              "location": {
-                "$ref": "#/$defs/MenuLocation"
-              },
+              "command": {"description": "A command from contributes.commands.", "$ref": "#/$defs/LocalId"},
+              "location": {"$ref": "#/$defs/MenuLocation"},
               "group": {
                 "description": "Items of one group sit together between separators, groups in order of first appearance.",
                 "$ref": "#/$defs/LocalId"
@@ -616,45 +384,23 @@
           "maxItems": 4,
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "title"
-            ],
+            "required": ["id", "title"],
             "additionalProperties": false,
             "properties": {
-              "id": {
-                "$ref": "#/$defs/LocalId"
-              },
+              "id": {"$ref": "#/$defs/LocalId"},
               "title": {
                 "description": "Its name in the status bar's menu and for screen readers.",
                 "$ref": "#/$defs/Title"
               },
-              "text": {
-                "$ref": "#/$defs/StatusText"
-              },
-              "icon": {
-                "$ref": "#/$defs/IconRef"
-              },
-              "tooltip": {
-                "$ref": "#/$defs/Summary"
-              },
+              "text": {"$ref": "#/$defs/StatusText"},
+              "icon": {"$ref": "#/$defs/IconRef"},
+              "tooltip": {"$ref": "#/$defs/Summary"},
               "command": {
                 "description": "A command from contributes.commands that a click runs.",
                 "$ref": "#/$defs/LocalId"
               }
             },
-            "anyOf": [
-              {
-                "required": [
-                  "text"
-                ]
-              },
-              {
-                "required": [
-                  "icon"
-                ]
-              }
-            ]
+            "anyOf": [{"required": ["text"]}, {"required": ["icon"]}]
           }
         },
         "keybindings": {
@@ -663,19 +409,11 @@
           "maxItems": 64,
           "items": {
             "type": "object",
-            "required": [
-              "command",
-              "key"
-            ],
+            "required": ["command", "key"],
             "additionalProperties": false,
             "properties": {
-              "command": {
-                "description": "A command from contributes.commands.",
-                "$ref": "#/$defs/LocalId"
-              },
-              "key": {
-                "$ref": "#/$defs/Key"
-              }
+              "command": {"description": "A command from contributes.commands.", "$ref": "#/$defs/LocalId"},
+              "key": {"$ref": "#/$defs/Key"}
             }
           }
         },
@@ -685,22 +423,12 @@
           "maxItems": 16,
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "title",
-              "platforms"
-            ],
+            "required": ["id", "title", "platforms"],
             "additionalProperties": false,
             "properties": {
-              "id": {
-                "$ref": "#/$defs/LocalId"
-              },
-              "title": {
-                "$ref": "#/$defs/Title"
-              },
-              "platforms": {
-                "$ref": "#/$defs/ProgramPlatforms"
-              },
+              "id": {"$ref": "#/$defs/LocalId"},
+              "title": {"$ref": "#/$defs/Title"},
+              "platforms": {"$ref": "#/$defs/ProgramPlatforms"},
               "network": {
                 "description": "The program may connect to the internet.",
                 "type": "boolean",
@@ -713,31 +441,13 @@
               },
               "confinement": {
                 "description": "Windows only: container runs it in an AppContainer; lowIntegrity at low integrity, for runtimes an AppContainer stops. Low integrity always has the network, so it needs network: true, and the install question says it can read your files.",
-                "enum": [
-                  "container",
-                  "lowIntegrity"
-                ],
+                "enum": ["container", "lowIntegrity"],
                 "default": "container"
               }
             },
             "anyOf": [
-              {
-                "properties": {
-                  "confinement": {
-                    "const": "container"
-                  }
-                }
-              },
-              {
-                "properties": {
-                  "network": {
-                    "const": true
-                  }
-                },
-                "required": [
-                  "network"
-                ]
-              }
+              {"properties": {"confinement": {"const": "container"}}},
+              {"properties": {"network": {"const": true}}, "required": ["network"]}
             ]
           }
         },
@@ -747,48 +457,30 @@
           "maxItems": 8,
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "title",
-              "program"
-            ],
+            "required": ["id", "title", "program"],
             "additionalProperties": false,
             "properties": {
-              "id": {
-                "$ref": "#/$defs/LocalId"
-              },
-              "title": {
-                "$ref": "#/$defs/Title"
-              },
+              "id": {"$ref": "#/$defs/LocalId"},
+              "title": {"$ref": "#/$defs/Title"},
               "program": {
                 "description": "A program from contributes.programs that speaks LSP on stdio.",
                 "$ref": "#/$defs/LocalId"
               },
               "scope": {
                 "description": "document: one text document per subtitle Document, one LSP line per Line; line: one per Line.",
-                "enum": [
-                  "document",
-                  "line"
-                ],
+                "enum": ["document", "line"],
                 "default": "document"
               },
               "fields": {
                 "type": "array",
                 "minItems": 1,
                 "maxItems": 2,
-                "items": {
-                  "$ref": "#/$defs/TextField"
-                },
-                "default": [
-                  "text"
-                ]
+                "items": {"$ref": "#/$defs/TextField"},
+                "default": ["text"]
               },
               "tags": {
                 "description": "keep sends override blocks; blank turns each one, \\N and \\h into as many spaces.",
-                "enum": [
-                  "keep",
-                  "blank"
-                ],
+                "enum": ["keep", "blank"],
                 "default": "blank"
               },
               "languageId": {
@@ -797,10 +489,7 @@
                 "maxLength": 64,
                 "default": "plaintext"
               },
-              "initializationOptions": {
-                "description": "Sent as is in initialize.",
-                "type": "object"
-              }
+              "initializationOptions": {"description": "Sent as is in initialize.", "type": "object"}
             }
           }
         },
@@ -819,22 +508,14 @@
                   "description": "Characters that ask for completions as they are typed.",
                   "type": "array",
                   "maxItems": 8,
-                  "items": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 1
-                  }
+                  "items": {"type": "string", "minLength": 1, "maxLength": 1}
                 },
                 "fields": {
                   "type": "array",
                   "minItems": 1,
                   "maxItems": 2,
-                  "items": {
-                    "$ref": "#/$defs/TextField"
-                  },
-                  "default": [
-                    "text"
-                  ]
+                  "items": {"$ref": "#/$defs/TextField"},
+                  "default": ["text"]
                 }
               }
             },
@@ -847,12 +528,8 @@
                   "type": "array",
                   "minItems": 1,
                   "maxItems": 2,
-                  "items": {
-                    "$ref": "#/$defs/TextField"
-                  },
-                  "default": [
-                    "text"
-                  ]
+                  "items": {"$ref": "#/$defs/TextField"},
+                  "default": ["text"]
                 }
               }
             }
@@ -864,12 +541,7 @@
           "maxItems": 64,
           "items": {
             "type": "object",
-            "required": [
-              "command",
-              "description",
-              "parameters",
-              "mark"
-            ],
+            "required": ["command", "description", "parameters", "mark"],
             "additionalProperties": false,
             "properties": {
               "command": {
@@ -885,29 +557,13 @@
               "parameters": {
                 "description": "A JSON Schema in the Hikari API's subset whose root is an object that refuses unknown properties.",
                 "type": "object",
-                "required": [
-                  "type",
-                  "additionalProperties"
-                ],
-                "properties": {
-                  "type": {
-                    "const": "object"
-                  },
-                  "additionalProperties": {
-                    "const": false
-                  }
-                }
+                "required": ["type", "additionalProperties"],
+                "properties": {"type": {"const": "object"}, "additionalProperties": {"const": false}}
               },
-              "result": {
-                "description": "A JSON Schema for what the command returns.",
-                "type": "object"
-              },
+              "result": {"description": "A JSON Schema for what the command returns.", "type": "object"},
               "mark": {
                 "description": "read: the tool changes nothing, and HikariSub refuses its writes.",
-                "enum": [
-                  "read",
-                  "write"
-                ]
+                "enum": ["read", "write"]
               }
             }
           }
@@ -918,22 +574,12 @@
           "maxItems": 4,
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "title",
-              "program"
-            ],
+            "required": ["id", "title", "program"],
             "additionalProperties": false,
             "properties": {
-              "id": {
-                "$ref": "#/$defs/LocalId"
-              },
-              "title": {
-                "$ref": "#/$defs/Title"
-              },
-              "description": {
-                "$ref": "#/$defs/Summary"
-              },
+              "id": {"$ref": "#/$defs/LocalId"},
+              "title": {"$ref": "#/$defs/Title"},
+              "description": {"$ref": "#/$defs/Summary"},
               "program": {
                 "description": "A program from contributes.programs that speaks MCP on stdio.",
                 "$ref": "#/$defs/LocalId"
@@ -947,58 +593,23 @@
           "maxItems": 16,
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "title",
-              "extensions"
-            ],
+            "required": ["id", "title", "extensions"],
             "additionalProperties": false,
             "properties": {
-              "id": {
-                "$ref": "#/$defs/LocalId"
-              },
-              "title": {
-                "$ref": "#/$defs/Title"
-              },
+              "id": {"$ref": "#/$defs/LocalId"},
+              "title": {"$ref": "#/$defs/Title"},
               "extensions": {
                 "type": "array",
                 "minItems": 1,
                 "maxItems": 8,
-                "items": {
-                  "type": "string",
-                  "pattern": "^[a-z0-9]{1,16}$"
-                }
+                "items": {"type": "string", "pattern": "^[a-z0-9]{1,16}$"}
               },
-              "import": {
-                "type": "boolean",
-                "default": false
-              },
-              "export": {
-                "type": "boolean",
-                "default": false
-              }
+              "import": {"type": "boolean", "default": false},
+              "export": {"type": "boolean", "default": false}
             },
             "anyOf": [
-              {
-                "properties": {
-                  "import": {
-                    "const": true
-                  }
-                },
-                "required": [
-                  "import"
-                ]
-              },
-              {
-                "properties": {
-                  "export": {
-                    "const": true
-                  }
-                },
-                "required": [
-                  "export"
-                ]
-              }
+              {"properties": {"import": {"const": true}}, "required": ["import"]},
+              {"properties": {"export": {"const": true}}, "required": ["export"]}
             ]
           }
         }
@@ -1008,49 +619,15 @@
   "anyOf": [
     {
       "description": "Only Full trust plugins can ship QML panels.",
-      "properties": {
-        "tier": {
-          "const": "unrestricted"
-        }
-      },
-      "required": [
-        "tier"
-      ]
+      "properties": {"tier": {"const": "unrestricted"}},
+      "required": ["tier"]
     },
-    {
-      "properties": {
-        "contributes": {
-          "properties": {
-            "panels": {
-              "items": {
-                "properties": {
-                  "qml": {
-                    "maxLength": 0
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+    {"properties": {"contributes": {"properties": {"panels": {"items": {"properties": {"qml": {"maxLength": 0}}}}}}}}
   ],
   "$defs": {
-    "LocalId": {
-      "type": "string",
-      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-      "maxLength": 64
-    },
-    "Title": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 100
-    },
-    "Reason": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 300
-    },
+    "LocalId": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "maxLength": 64},
+    "Title": {"type": "string", "minLength": 1, "maxLength": 100},
+    "Reason": {"type": "string", "minLength": 1, "maxLength": 300},
     "Host": {
       "description": "A host name the plugin may reach over HTTPS; no scheme, port or wildcard.",
       "type": "string",
@@ -1064,66 +641,24 @@
     },
     "NodePort": {
       "type": "object",
-      "required": [
-        "name",
-        "type"
-      ],
+      "required": ["name", "type"],
       "additionalProperties": false,
       "properties": {
-        "name": {
-          "type": "string",
-          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
-          "maxLength": 64
-        },
-        "type": {
-          "enum": [
-            "Number",
-            "Text",
-            "Colour",
-            "Alpha",
-            "Time",
-            "Point",
-            "Bool",
-            "Tags"
-          ]
-        }
+        "name": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$", "maxLength": 64},
+        "type": {"enum": ["Number", "Text", "Colour", "Alpha", "Time", "Point", "Bool", "Tags"]}
       }
     },
     "NodeInput": {
       "type": "object",
-      "required": [
-        "name",
-        "type"
-      ],
+      "required": ["name", "type"],
       "additionalProperties": false,
       "properties": {
-        "name": {
-          "type": "string",
-          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
-          "maxLength": 64
-        },
-        "type": {
-          "enum": [
-            "Number",
-            "Text",
-            "Colour",
-            "Alpha",
-            "Time",
-            "Point",
-            "Bool",
-            "Tags"
-          ]
-        },
-        "default": {
-          "description": "Its value while no wire reaches it: a number, text, #RRGGBB, [x, y] or a boolean, by its type."
-        }
+        "name": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$", "maxLength": 64},
+        "type": {"enum": ["Number", "Text", "Colour", "Alpha", "Time", "Point", "Bool", "Tags"]},
+        "default": {"description": "Its value while no wire reaches it: a number, text, #RRGGBB, [x, y] or a boolean, by its type."}
       }
     },
-    "Summary": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 300
-    },
+    "Summary": {"type": "string", "minLength": 1, "maxLength": 300},
     "FolderPath": {
       "type": "string",
       "maxLength": 200,
@@ -1160,131 +695,67 @@
       "type": "array",
       "minItems": 1,
       "maxItems": 8,
-      "items": {
-        "type": "string",
-        "pattern": "^!?(document|selection|multipleLines|video|audio|karaoke|translation)$"
-      }
+      "items": {"type": "string", "pattern": "^!?(document|selection|multipleLines|video|audio|karaoke|translation)$"}
     },
-    "MenuLocation": {
-      "enum": [
-        "grid.context",
-        "lineEditor.context",
-        "menuBar"
-      ]
-    },
-    "StatusText": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 40,
-      "pattern": "^[^\\u0000-\\u001F\\u007F]+$"
-    },
+    "MenuLocation": {"enum": ["grid.context", "lineEditor.context", "menuBar"]},
+    "StatusText": {"type": "string", "minLength": 1, "maxLength": 40, "pattern": "^[^\\u0000-\\u001F\\u007F]+$"},
     "Key": {
       "description": "One chord in Qt's portable text, modifiers in the order Ctrl, Alt, Shift, Meta. Without Ctrl or Alt it must be F1 to F24.",
       "type": "string",
       "pattern": "^(Ctrl\\+(Alt\\+)?|Alt\\+)(Shift\\+)?(Meta\\+)?([A-Z0-9]|F([1-9]|1[0-9]|2[0-4])|Space|Tab|Return|Enter|Backspace|Del|Ins|Home|End|PgUp|PgDown|Left|Right|Up|Down|[-=\\[\\];',./`\\\\])$|^(Shift\\+)?(Meta\\+)?F([1-9]|1[0-9]|2[0-4])$"
     },
-    "TextField": {
-      "enum": [
-        "text",
-        "translation"
-      ]
-    },
-    "Sha256": {
-      "type": "string",
-      "pattern": "^[0-9a-f]{64}$"
-    },
+    "TextField": {"enum": ["text", "translation"]},
+    "Sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "ProgramArgs": {
       "description": "${package}, ${data} and ${cache} become the plugin's folders, and ${setting:<id>} a setting's value; never a secret, which only env may take.",
       "type": "array",
       "maxItems": 64,
-      "items": {
-        "type": "string",
-        "maxLength": 1000
-      }
+      "items": {"type": "string", "maxLength": 1000}
     },
     "ProgramEnv": {
       "description": "Values take the same ${...} names as ProgramArgs, and ${setting:<id>} may name a secret.",
       "type": "object",
       "additionalProperties": false,
-      "patternProperties": {
-        "^[A-Z_][A-Z0-9_]{0,63}$": {
-          "type": "string",
-          "maxLength": 1000
-        }
-      }
+      "patternProperties": {"^[A-Z_][A-Z0-9_]{0,63}$": {"type": "string", "maxLength": 1000}}
     },
     "ProgramRun": {
       "oneOf": [
         {
           "description": "Bundled in the package.",
           "type": "object",
-          "required": [
-            "path"
-          ],
+          "required": ["path"],
           "additionalProperties": false,
           "properties": {
-            "path": {
-              "description": "The program's file in the package.",
-              "$ref": "#/$defs/FolderPath"
-            },
-            "args": {
-              "$ref": "#/$defs/ProgramArgs"
-            },
-            "env": {
-              "$ref": "#/$defs/ProgramEnv"
-            }
+            "path": {"description": "The program's file in the package.", "$ref": "#/$defs/FolderPath"},
+            "args": {"$ref": "#/$defs/ProgramArgs"},
+            "env": {"$ref": "#/$defs/ProgramEnv"}
           }
         },
         {
           "description": "Downloaded by HikariSub and checked against its SHA-256.",
           "type": "object",
-          "required": [
-            "download"
-          ],
+          "required": ["download"],
           "additionalProperties": false,
           "properties": {
             "download": {
               "type": "object",
-              "required": [
-                "url",
-                "sha256",
-                "size"
-              ],
+              "required": ["url", "sha256", "size"],
               "additionalProperties": false,
               "properties": {
-                "url": {
-                  "type": "string",
-                  "maxLength": 500,
-                  "pattern": "^https://"
-                },
-                "sha256": {
-                  "description": "Of the downloaded file.",
-                  "$ref": "#/$defs/Sha256"
-                },
+                "url": {"type": "string", "maxLength": 500, "pattern": "^https://"},
+                "sha256": {"description": "Of the downloaded file.", "$ref": "#/$defs/Sha256"},
                 "size": {
                   "description": "Bytes of the downloaded file.",
                   "type": "integer",
                   "minimum": 1,
                   "maximum": 1073741824
                 },
-                "archive": {
-                  "enum": [
-                    "zip",
-                    "tar.gz"
-                  ]
-                },
-                "entry": {
-                  "description": "With archive: the program's file inside it.",
-                  "$ref": "#/$defs/FolderPath"
-                }
+                "archive": {"enum": ["zip", "tar.gz"]},
+                "entry": {"description": "With archive: the program's file inside it.", "$ref": "#/$defs/FolderPath"}
               }
             },
-            "args": {
-              "$ref": "#/$defs/ProgramArgs"
-            },
-            "env": {
-              "$ref": "#/$defs/ProgramEnv"
-            }
+            "args": {"$ref": "#/$defs/ProgramArgs"},
+            "env": {"$ref": "#/$defs/ProgramEnv"}
           }
         }
       ]
@@ -1292,42 +763,14 @@
     "ProgramPlatforms": {
       "type": "object",
       "additionalProperties": false,
-      "patternProperties": {
-        "^(windows|linux|macos)-(x64|arm64)$": {
-          "$ref": "#/$defs/ProgramRun"
-        }
-      },
+      "patternProperties": {"^(windows|linux|macos)-(x64|arm64)$": {"$ref": "#/$defs/ProgramRun"}},
       "anyOf": [
-        {
-          "required": [
-            "windows-x64"
-          ]
-        },
-        {
-          "required": [
-            "linux-x64"
-          ]
-        },
-        {
-          "required": [
-            "windows-arm64"
-          ]
-        },
-        {
-          "required": [
-            "linux-arm64"
-          ]
-        },
-        {
-          "required": [
-            "macos-x64"
-          ]
-        },
-        {
-          "required": [
-            "macos-arm64"
-          ]
-        }
+        {"required": ["windows-x64"]},
+        {"required": ["linux-x64"]},
+        {"required": ["windows-arm64"]},
+        {"required": ["linux-arm64"]},
+        {"required": ["macos-x64"]},
+        {"required": ["macos-arm64"]}
       ]
     },
     "StylesPath": {
@@ -1350,45 +793,20 @@
       "maxLength": 200,
       "pattern": "^([A-Za-z0-9_][A-Za-z0-9_.-]*/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\\.json$"
     },
-    "QmlPath": {
-      "type": "string",
-      "maxLength": 200,
-      "pattern": "^([A-Za-z0-9_][A-Za-z0-9_.-]*/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\\.qml$"
-    },
-    "IconPath": {
-      "type": "string",
-      "maxLength": 200,
-      "pattern": "^([A-Za-z0-9_][A-Za-z0-9_.-]*/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\\.(png|svg)$"
-    },
-    "ScreenshotPath": {
-      "type": "string",
-      "maxLength": 200,
-      "pattern": "^([A-Za-z0-9_][A-Za-z0-9_.-]*/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\\.(png|jpg)$"
-    },
+    "QmlPath": {"type": "string", "maxLength": 200, "pattern": "^([A-Za-z0-9_][A-Za-z0-9_.-]*/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\\.qml$"},
+    "IconPath": {"type": "string", "maxLength": 200, "pattern": "^([A-Za-z0-9_][A-Za-z0-9_.-]*/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\\.(png|svg)$"},
+    "ScreenshotPath": {"type": "string", "maxLength": 200, "pattern": "^([A-Za-z0-9_][A-Za-z0-9_.-]*/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\\.(png|jpg)$"},
     "Setting": {
       "oneOf": [
         {
           "type": "object",
-          "required": [
-            "id",
-            "title",
-            "type",
-            "default"
-          ],
+          "required": ["id", "title", "type", "default"],
           "additionalProperties": false,
           "properties": {
-            "id": {
-              "$ref": "#/$defs/LocalId"
-            },
-            "title": {
-              "$ref": "#/$defs/Title"
-            },
-            "type": {
-              "const": "boolean"
-            },
-            "default": {
-              "type": "boolean"
-            },
+            "id": {"$ref": "#/$defs/LocalId"},
+            "title": {"$ref": "#/$defs/Title"},
+            "type": {"const": "boolean"},
+            "default": {"type": "boolean"},
             "description": {
               "description": "Plain text under the title.",
               "type": "string",
@@ -1399,11 +817,7 @@
               "description": "More words the Settings search matches.",
               "type": "array",
               "maxItems": 16,
-              "items": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 50
-              }
+              "items": {"type": "string", "minLength": 1, "maxLength": 50}
             },
             "deprecated": {
               "description": "Why the setting is going; Settings hides it unless its value isn't the default, and then shows this.",
@@ -1415,46 +829,21 @@
               "description": "Settings of one group share a heading on the plugin's page, groups in order of their first setting.",
               "$ref": "#/$defs/Title"
             },
-            "order": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 9999
-            },
-            "projectable": {
-              "description": "false: a Project can't override it.",
-              "type": "boolean",
-              "default": true
-            }
+            "order": {"type": "integer", "minimum": 0, "maximum": 9999},
+            "projectable": {"description": "false: a Project can't override it.", "type": "boolean", "default": true}
           }
         },
         {
           "type": "object",
-          "required": [
-            "id",
-            "title",
-            "type",
-            "default"
-          ],
+          "required": ["id", "title", "type", "default"],
           "additionalProperties": false,
           "properties": {
-            "id": {
-              "$ref": "#/$defs/LocalId"
-            },
-            "title": {
-              "$ref": "#/$defs/Title"
-            },
-            "type": {
-              "const": "integer"
-            },
-            "default": {
-              "type": "integer"
-            },
-            "minimum": {
-              "type": "integer"
-            },
-            "maximum": {
-              "type": "integer"
-            },
+            "id": {"$ref": "#/$defs/LocalId"},
+            "title": {"$ref": "#/$defs/Title"},
+            "type": {"const": "integer"},
+            "default": {"type": "integer"},
+            "minimum": {"type": "integer"},
+            "maximum": {"type": "integer"},
             "description": {
               "description": "Plain text under the title.",
               "type": "string",
@@ -1465,11 +854,7 @@
               "description": "More words the Settings search matches.",
               "type": "array",
               "maxItems": 16,
-              "items": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 50
-              }
+              "items": {"type": "string", "minLength": 1, "maxLength": 50}
             },
             "deprecated": {
               "description": "Why the setting is going; Settings hides it unless its value isn't the default, and then shows this.",
@@ -1481,46 +866,21 @@
               "description": "Settings of one group share a heading on the plugin's page, groups in order of their first setting.",
               "$ref": "#/$defs/Title"
             },
-            "order": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 9999
-            },
-            "projectable": {
-              "description": "false: a Project can't override it.",
-              "type": "boolean",
-              "default": true
-            }
+            "order": {"type": "integer", "minimum": 0, "maximum": 9999},
+            "projectable": {"description": "false: a Project can't override it.", "type": "boolean", "default": true}
           }
         },
         {
           "type": "object",
-          "required": [
-            "id",
-            "title",
-            "type",
-            "default"
-          ],
+          "required": ["id", "title", "type", "default"],
           "additionalProperties": false,
           "properties": {
-            "id": {
-              "$ref": "#/$defs/LocalId"
-            },
-            "title": {
-              "$ref": "#/$defs/Title"
-            },
-            "type": {
-              "const": "number"
-            },
-            "default": {
-              "type": "number"
-            },
-            "minimum": {
-              "type": "number"
-            },
-            "maximum": {
-              "type": "number"
-            },
+            "id": {"$ref": "#/$defs/LocalId"},
+            "title": {"$ref": "#/$defs/Title"},
+            "type": {"const": "number"},
+            "default": {"type": "number"},
+            "minimum": {"type": "number"},
+            "maximum": {"type": "number"},
             "description": {
               "description": "Plain text under the title.",
               "type": "string",
@@ -1531,11 +891,7 @@
               "description": "More words the Settings search matches.",
               "type": "array",
               "maxItems": 16,
-              "items": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 50
-              }
+              "items": {"type": "string", "minLength": 1, "maxLength": 50}
             },
             "deprecated": {
               "description": "Why the setting is going; Settings hides it unless its value isn't the default, and then shows this.",
@@ -1547,46 +903,20 @@
               "description": "Settings of one group share a heading on the plugin's page, groups in order of their first setting.",
               "$ref": "#/$defs/Title"
             },
-            "order": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 9999
-            },
-            "projectable": {
-              "description": "false: a Project can't override it.",
-              "type": "boolean",
-              "default": true
-            }
+            "order": {"type": "integer", "minimum": 0, "maximum": 9999},
+            "projectable": {"description": "false: a Project can't override it.", "type": "boolean", "default": true}
           }
         },
         {
           "type": "object",
-          "required": [
-            "id",
-            "title",
-            "type",
-            "default"
-          ],
+          "required": ["id", "title", "type", "default"],
           "additionalProperties": false,
           "properties": {
-            "id": {
-              "$ref": "#/$defs/LocalId"
-            },
-            "title": {
-              "$ref": "#/$defs/Title"
-            },
-            "type": {
-              "const": "string"
-            },
-            "default": {
-              "type": "string",
-              "maxLength": 1000
-            },
-            "multiline": {
-              "description": "Edited in a box of several lines.",
-              "type": "boolean",
-              "default": false
-            },
+            "id": {"$ref": "#/$defs/LocalId"},
+            "title": {"$ref": "#/$defs/Title"},
+            "type": {"const": "string"},
+            "default": {"type": "string", "maxLength": 1000},
+            "multiline": {"description": "Edited in a box of several lines.", "type": "boolean", "default": false},
             "description": {
               "description": "Plain text under the title.",
               "type": "string",
@@ -1597,11 +927,7 @@
               "description": "More words the Settings search matches.",
               "type": "array",
               "maxItems": 16,
-              "items": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 50
-              }
+              "items": {"type": "string", "minLength": 1, "maxLength": 50}
             },
             "deprecated": {
               "description": "Why the setting is going; Settings hides it unless its value isn't the default, and then shows this.",
@@ -1613,49 +939,20 @@
               "description": "Settings of one group share a heading on the plugin's page, groups in order of their first setting.",
               "$ref": "#/$defs/Title"
             },
-            "order": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 9999
-            },
-            "projectable": {
-              "description": "false: a Project can't override it.",
-              "type": "boolean",
-              "default": true
-            }
+            "order": {"type": "integer", "minimum": 0, "maximum": 9999},
+            "projectable": {"description": "false: a Project can't override it.", "type": "boolean", "default": true}
           }
         },
         {
           "type": "object",
-          "required": [
-            "id",
-            "title",
-            "type",
-            "options",
-            "default"
-          ],
+          "required": ["id", "title", "type", "options", "default"],
           "additionalProperties": false,
           "properties": {
-            "id": {
-              "$ref": "#/$defs/LocalId"
-            },
-            "title": {
-              "$ref": "#/$defs/Title"
-            },
-            "type": {
-              "const": "choice"
-            },
-            "options": {
-              "type": "array",
-              "minItems": 1,
-              "maxItems": 64,
-              "items": {
-                "$ref": "#/$defs/Title"
-              }
-            },
-            "default": {
-              "$ref": "#/$defs/Title"
-            },
+            "id": {"$ref": "#/$defs/LocalId"},
+            "title": {"$ref": "#/$defs/Title"},
+            "type": {"const": "choice"},
+            "options": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"$ref": "#/$defs/Title"}},
+            "default": {"$ref": "#/$defs/Title"},
             "description": {
               "description": "Plain text under the title.",
               "type": "string",
@@ -1666,11 +963,7 @@
               "description": "More words the Settings search matches.",
               "type": "array",
               "maxItems": 16,
-              "items": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 50
-              }
+              "items": {"type": "string", "minLength": 1, "maxLength": 50}
             },
             "deprecated": {
               "description": "Why the setting is going; Settings hides it unless its value isn't the default, and then shows this.",
@@ -1682,50 +975,20 @@
               "description": "Settings of one group share a heading on the plugin's page, groups in order of their first setting.",
               "$ref": "#/$defs/Title"
             },
-            "order": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 9999
-            },
-            "projectable": {
-              "description": "false: a Project can't override it.",
-              "type": "boolean",
-              "default": true
-            }
+            "order": {"type": "integer", "minimum": 0, "maximum": 9999},
+            "projectable": {"description": "false: a Project can't override it.", "type": "boolean", "default": true}
           }
         },
         {
           "type": "object",
-          "required": [
-            "id",
-            "title",
-            "type",
-            "default"
-          ],
+          "required": ["id", "title", "type", "default"],
           "additionalProperties": false,
           "properties": {
-            "id": {
-              "$ref": "#/$defs/LocalId"
-            },
-            "title": {
-              "$ref": "#/$defs/Title"
-            },
-            "type": {
-              "const": "list"
-            },
-            "default": {
-              "type": "array",
-              "maxItems": 256,
-              "items": {
-                "type": "string",
-                "maxLength": 1000
-              }
-            },
-            "maxItems": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 256
-            },
+            "id": {"$ref": "#/$defs/LocalId"},
+            "title": {"$ref": "#/$defs/Title"},
+            "type": {"const": "list"},
+            "default": {"type": "array", "maxItems": 256, "items": {"type": "string", "maxLength": 1000}},
+            "maxItems": {"type": "integer", "minimum": 1, "maximum": 256},
             "description": {
               "description": "Plain text under the title.",
               "type": "string",
@@ -1736,11 +999,7 @@
               "description": "More words the Settings search matches.",
               "type": "array",
               "maxItems": 16,
-              "items": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 50
-              }
+              "items": {"type": "string", "minLength": 1, "maxLength": 50}
             },
             "deprecated": {
               "description": "Why the setting is going; Settings hides it unless its value isn't the default, and then shows this.",
@@ -1752,36 +1011,18 @@
               "description": "Settings of one group share a heading on the plugin's page, groups in order of their first setting.",
               "$ref": "#/$defs/Title"
             },
-            "order": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 9999
-            },
-            "projectable": {
-              "description": "false: a Project can't override it.",
-              "type": "boolean",
-              "default": true
-            }
+            "order": {"type": "integer", "minimum": 0, "maximum": 9999},
+            "projectable": {"description": "false: a Project can't override it.", "type": "boolean", "default": true}
           }
         },
         {
           "type": "object",
-          "required": [
-            "id",
-            "title",
-            "type"
-          ],
+          "required": ["id", "title", "type"],
           "additionalProperties": false,
           "properties": {
-            "id": {
-              "$ref": "#/$defs/LocalId"
-            },
-            "title": {
-              "$ref": "#/$defs/Title"
-            },
-            "type": {
-              "const": "secret"
-            },
+            "id": {"$ref": "#/$defs/LocalId"},
+            "title": {"$ref": "#/$defs/Title"},
+            "type": {"const": "secret"},
             "description": {
               "description": "Plain text under the title.",
               "type": "string",
@@ -1792,11 +1033,7 @@
               "description": "More words the Settings search matches.",
               "type": "array",
               "maxItems": 16,
-              "items": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 50
-              }
+              "items": {"type": "string", "minLength": 1, "maxLength": 50}
             },
             "deprecated": {
               "description": "Why the setting is going; Settings hides it unless its value isn't the default, and then shows this.",
@@ -1808,15 +1045,8 @@
               "description": "Settings of one group share a heading on the plugin's page, groups in order of their first setting.",
               "$ref": "#/$defs/Title"
             },
-            "order": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 9999
-            },
-            "projectable": {
-              "description": "Always false: a secret stays in the system keychain.",
-              "const": false
-            }
+            "order": {"type": "integer", "minimum": 0, "maximum": 9999},
+            "projectable": {"description": "Always false: a secret stays in the system keychain.", "const": false}
           }
         }
       ]

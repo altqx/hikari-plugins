@@ -2,6 +2,7 @@
 
 import io
 import json
+import re
 import stat
 import zipfile
 from dataclasses import dataclass, field
@@ -13,13 +14,15 @@ import jsonschema
 from . import media, themes
 
 MAX_PACKAGE_BYTES = 64 * 1024 * 1024
+MAX_PLATFORM_PACKAGE_BYTES = 256 * 1024 * 1024
+PLATFORM = re.compile(r"(windows|linux|macos)-(x64|arm64)")
 MAX_PACKAGE_FILES = 4096
 MANIFEST = "hikari-plugin.json"
 README = "README.md"
 SCHEMA = Path(__file__).resolve().parent.parent / "schemas" / "hikari-plugin.schema.json"
 ICON_ROLES = Path(__file__).resolve().parent.parent / "config" / "icon-roles.json"
 NEEDS_CODE = ("commands", "panels", "menus", "statusItems", "keybindings", "providers", "aiTools", "formats")
-UNIQUE_IDS = ("themes", "iconThemes", "icons", "styles", "karaokePresets", "statusItems", "programs", "formats")
+UNIQUE_IDS = ("themes", "iconThemes", "icons", "styles", "karaokePresets", "statusItems", "formats")
 _ALLOWED = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 _.-+")
 _DEVICES = {"con", "prn", "aux", "nul"}
 
@@ -61,7 +64,7 @@ def validate_manifest(manifest) -> None:
         raise PackageError(f"manifest: {where}: {e.message}")
 
 
-def read_zip(data: bytes) -> dict[str, bytes]:
+def read_zip(data: bytes, limit: int = MAX_PACKAGE_BYTES) -> dict[str, bytes]:
     try:
         z = zipfile.ZipFile(io.BytesIO(data))
     except zipfile.BadZipFile as e:
@@ -69,8 +72,8 @@ def read_zip(data: bytes) -> dict[str, bytes]:
     entries = [i for i in z.infolist() if not i.is_dir()]
     if len(entries) > MAX_PACKAGE_FILES:
         raise PackageError(f"more than {MAX_PACKAGE_FILES} files")
-    if sum(i.file_size for i in entries) > MAX_PACKAGE_BYTES:
-        raise PackageError("over 64 MiB unpacked")
+    if sum(i.file_size for i in entries) > limit:
+        raise PackageError(f"over {limit // (1024 * 1024)} MiB unpacked")
     files = {}
     for info in entries:
         if stat.S_ISLNK(info.external_attr >> 16):
@@ -83,10 +86,12 @@ def read_zip(data: bytes) -> dict[str, bytes]:
     return files
 
 
-def open_package(data: bytes, api_version: int) -> Package:
-    if len(data) > MAX_PACKAGE_BYTES:
-        raise PackageError("over 64 MiB")
-    files = read_zip(data)
+def open_package(data: bytes, api_version: int, platform: str | None = None) -> Package:
+    """`platform` opens a package built for that platform alone, which may leave out other platforms' programs."""
+    limit = MAX_PLATFORM_PACKAGE_BYTES if platform else MAX_PACKAGE_BYTES
+    if len(data) > limit:
+        raise PackageError(f"over {limit // (1024 * 1024)} MiB")
+    files = read_zip(data, limit)
     seen = set()
     for path in files:
         if not good_path(path) or path.lower() in seen:
@@ -108,6 +113,7 @@ def open_package(data: bytes, api_version: int) -> Package:
         raise PackageError(f"{manifest['main']}: main file missing")
     _check_kind(manifest)
     _check_ids(manifest)
+    _check_programs(manifest, files, platform)
     pkg = Package(manifest, files)
     _check_media(pkg)
     _check_looks(pkg)
@@ -180,6 +186,29 @@ def _check_looks(pkg: Package) -> None:
             media.check_interface_icon(path, files[path])
     except media.MediaError as e:
         raise PackageError(str(e)) from e
+
+
+def _check_programs(manifest: dict, files: dict[str, bytes], platform: str | None) -> None:
+    programs = manifest.get("contributes", {}).get("programs", [])
+    if programs and "programs" not in manifest.get("permissions", {}):
+        raise PackageError("manifest: programs need permissions.programs")
+    ids = [p["id"] for p in programs]
+    if len(set(ids)) != len(ids):
+        raise PackageError("manifest: two programs share an id")
+    left_out = False
+    for program in programs:
+        for name, run in program["platforms"].items():
+            at = f"program {program['id']} on {name}"
+            if "download" in run:
+                if ("archive" in run["download"]) != ("entry" in run["download"]):
+                    raise PackageError(f"{at}: archive and entry come together, or neither")
+            elif run["path"] not in files:
+                if platform in (None, name):
+                    raise PackageError(f"{run['path']}: {at} is not in the package")
+                left_out = True
+    total = sum(len(f) for f in files.values())
+    if total > MAX_PACKAGE_BYTES and not left_out:
+        raise PackageError("over 64 MiB unpacked")
 
 
 def _check_media(pkg: Package) -> None:

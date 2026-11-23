@@ -21,6 +21,8 @@ The registry behind the [HikariSub plugin marketplace](https://marketplace.hikar
 
 4. Publish a GitHub release with `<id>-<version>.hikariplugin` and `<id>-<version>.hikariplugin.minisig`. Within half an hour it's checked and published, and its release notes become its changelog. Drafts and pre-releases are skipped. A repository can hold several of your plugins: give each its own listing, and tag each release `<id>-v<version>` (`alice.karaoke-tools-v1.2.0`), so CI knows which plugin it belongs to.
 
+   A plugin whose bundled programs differ per platform may instead release one package per platform, `<id>-<version>-<platform>.hikariplugin` with its `.minisig`, for `linux-x64`, `linux-arm64`, `windows-x64`, `windows-arm64`, `macos-x64` and `macos-arm64`. Each holds the same `hikari-plugin.json`, byte for byte, and only its own platform's programs, and may be 256 MiB unpacked. HikariSub installs the one for its computer. A release has one kind or the other, never both.
+
 Check a package before releasing it:
 
 ```sh
@@ -28,12 +30,14 @@ pip install -r requirements.txt
 python -m registry check-package alice.karaoke-tools-1.0.0.hikariplugin --listing plugins/alice.karaoke-tools.json
 ```
 
+A package named `…-<platform>.hikariplugin` is checked as that platform's; without `--listing`, pass `--platform linux-x64`.
+
 A release that fails is recorded and reported in an issue here; publish a new version once it's fixed. Version numbers are never reused.
 
 ## What CI checks
 
 - **Listings** ([schema](schemas/listing.schema.json)): the file is named after the id; the id's first segment is the author's handle; one handle has one key; a repository belongs to one handle; one or two categories. The `hikarisub` handle is reserved for HikariSub's own plugins: a listing under it must use the key in [`keys/hikarisub.pub`](keys/hikarisub.pub) (C399EBCEA48BCB30). Handles that contain a reserved one once hyphens are dropped (`hikari-sub`, `hikarisub-official`) are refused. [`config/registry.json`](config/registry.json) names the reserved handles and their keys. On a pull request, CI lists what it changes for the reviewers: new handles, key changes and revocations. Removing a listing fails: versions are never deleted, only revoked.
-- **Releases:** the author's signature with the listing's key; the package rules of PL1 (paths, sizes, the manifest [schema](schemas/hikari-plugin.schema.json), a copy of HikariSub's own, the API number, the main file when there is one, and HikariSub's rules for a package without one: no code, settings or permissions, never `unrestricted`); colour themes against [HikariSub's theme schema](schemas/hikari-theme.schema.json) and contrast check, with the type their entry names, held to the same [vectors](tests/vectors/contrast-vectors.json) as HikariSub's own tests; icon themes holding every role in [`config/icon-roles.json`](config/icon-roles.json), and own icons, each an SVG with a `0 0 16 16` viewBox that draws in `currentColor` only; the media rules (icon, screenshots, README), plus one of the registry's own: an SVG icon may not have a `<style>` element or a `style` attribute, only presentation attributes such as `fill`; the id against the listing and the handle; the version against the file name and the last published version; the marketplace's required fields.
+- **Releases:** the author's signature with the listing's key; the package rules of PL1 (paths, sizes, the manifest [schema](schemas/hikari-plugin.schema.json), a copy of HikariSub's own, the API number, the main file when there is one, and HikariSub's rules for a package without one: no code, settings or permissions, never `unrestricted`); colour themes against [HikariSub's theme schema](schemas/hikari-theme.schema.json) and contrast check, with the type their entry names, held to the same [vectors](tests/vectors/contrast-vectors.json) as HikariSub's own tests; icon themes holding every role in [`config/icon-roles.json`](config/icon-roles.json), and own icons, each an SVG with a `0 0 16 16` viewBox that draws in `currentColor` only; the media rules (icon, screenshots, README), plus one of the registry's own: an SVG icon may not have a `<style>` element or a `style` attribute, only presentation attributes such as `fill`; the programs: `permissions.programs`, a bundled program's file in the package (in a per-platform package, its own platform's), and every program download fetched and checked against its `size` and `sha256`; per-platform packages have the same manifest; the id against the listing and the handle; the version against the file name and the last published version; the marketplace's required fields.
 - **Permissions:** a version that asks for more than the last published one (a network host, a folder or writing to it, `documents.all`, the unrestricted tier) is held. CI opens a pull request adding `approvals/<id>/<version>.json` with the package's SHA-256; merging it publishes exactly those bytes. A plugin's first version is compared with nothing, so a first version with any permission is reviewed too.
 
 ## Revoking
@@ -49,7 +53,7 @@ A pull request to the listing:
 
 ## The index
 
-[`schemas/index.schema.json`](schemas/index.schema.json) describes `index.json`. It is signed into `index.json.minisig` with the marketplace key, and its `serial` grows with every change, so HikariSub can refuse an older index. Packages and media live under `/p/<id>/<version>…` next to it. `published/` is the registry's own record of what it has published; only CI writes it.
+[`schemas/index.schema.json`](schemas/index.schema.json) describes `index.json`. It is signed into `index.json.minisig` with the marketplace key, and its `serial` grows with every change, so HikariSub can refuse an older index. Packages and media live under `/p/<id>/<version>…` next to it; a version released per platform lists `packages`, one `url`, `sha256` and `size` per platform, at `/p/<id>/<version>-<platform>.hikariplugin`. `published/` is the registry's own record of what it has published; only CI writes it. CI's `check-index --packages` builds the index from `published/`, checks it against the schema, says whether it is the last published serial, and downloads every published package to check it again.
 
 ## Keys and storage
 
