@@ -10,13 +10,16 @@ from pathlib import Path
 
 import jsonschema
 
-from . import media
+from . import media, themes
 
 MAX_PACKAGE_BYTES = 64 * 1024 * 1024
 MAX_PACKAGE_FILES = 4096
 MANIFEST = "hikari-plugin.json"
 README = "README.md"
 SCHEMA = Path(__file__).resolve().parent.parent / "schemas" / "hikari-plugin.schema.json"
+ICON_ROLES = Path(__file__).resolve().parent.parent / "config" / "icon-roles.json"
+NEEDS_CODE = ("commands", "panels", "menus", "statusItems", "keybindings", "providers", "aiTools", "formats")
+UNIQUE_IDS = ("themes", "iconThemes", "icons", "styles", "karaokePresets", "statusItems", "programs", "formats")
 _ALLOWED = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 _.-+")
 _DEVICES = {"con", "prn", "aux", "nul"}
 
@@ -101,11 +104,82 @@ def open_package(data: bytes, api_version: int) -> Package:
     validate_manifest(manifest)
     if manifest["api"] > api_version:
         raise PackageError(f"needs API {manifest['api']}; the newest is {api_version}")
-    if manifest["main"] not in files:
+    if isinstance(manifest.get("main"), str) and manifest["main"] not in files:
         raise PackageError(f"{manifest['main']}: main file missing")
+    _check_kind(manifest)
+    _check_ids(manifest)
     pkg = Package(manifest, files)
     _check_media(pkg)
+    _check_looks(pkg)
     return pkg
+
+
+@cache
+def icon_roles() -> tuple[str, ...]:
+    return tuple(json.loads(ICON_ROLES.read_text())["roles"])
+
+
+def _check_kind(m: dict) -> None:
+    """A package without main runs no code, so it holds nothing that needs code (docs/plugins.md, Kinds of package)."""
+    if "main" in m:
+        return
+    contributes, permissions = m.get("contributes", {}), m.get("permissions", {})
+    programs = bool(contributes.get("programs"))
+    kind = "a package of programs" if programs else "a data-only package"
+    if m.get("tier") == "unrestricted":
+        raise PackageError("manifest: tier: only a plugin with a Lua main can be unrestricted")
+    for key in NEEDS_CODE:
+        if contributes.get(key):
+            raise PackageError(f"manifest: contributes/{key}: needs code, and {kind} runs none")
+    for key in ("background", "presence"):
+        if permissions.get(key):
+            raise PackageError(f"manifest: permissions/{key}: needs code, and {kind} runs none")
+    if programs:
+        return
+    if permissions:
+        raise PackageError("manifest: permissions: a data-only package asks for no permissions")
+    if contributes.get("settings"):
+        raise PackageError("manifest: contributes/settings: a data-only package has no settings")
+
+
+def _check_ids(m: dict) -> None:
+    contributes = m.get("contributes", {})
+    for key in UNIQUE_IDS:
+        seen = set()
+        for i, item in enumerate(contributes.get(key, [])):
+            if item["id"] in seen:
+                raise PackageError(f"manifest: contributes/{key}/{i}/id: repeats the id {item['id']}")
+            seen.add(item["id"])
+    own = {icon["id"] for icon in contributes.get("icons", [])}
+    for key in ("commands", "panels", "statusItems"):
+        for i, item in enumerate(contributes.get(key, [])):
+            icon = item.get("icon", "")
+            if icon.startswith("own:") and icon[4:] not in own:
+                raise PackageError(f"manifest: contributes/{key}/{i}/icon: names no icon in contributes.icons")
+
+
+def _check_looks(pkg: Package) -> None:
+    contributes, files = pkg.manifest.get("contributes", {}), pkg.files
+    missing = "names no file in the package (the case must match)"
+    for theme in contributes.get("themes", []):
+        path = theme["path"]
+        if path not in files:
+            raise PackageError(f"{path} {missing}")
+        try:
+            loaded = themes.load(files[path])
+        except themes.ThemeError as e:
+            raise PackageError(f"{path} fails the theme check at {e}") from e
+        if loaded["type"] != theme["type"]:
+            raise PackageError(f"{path} is a {loaded['type']} theme, and hikari-plugin.json lists it as {theme['type']}")
+    icons = [f"{t['path']}/{role}.svg" for t in contributes.get("iconThemes", []) for role in icon_roles()]
+    icons += [icon["path"] for icon in contributes.get("icons", [])]
+    try:
+        for path in icons:
+            if path not in files:
+                raise media.MediaError(path, missing)
+            media.check_interface_icon(path, files[path])
+    except media.MediaError as e:
+        raise PackageError(str(e)) from e
 
 
 def _check_media(pkg: Package) -> None:

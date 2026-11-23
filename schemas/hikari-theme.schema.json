@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hikarisub.altqx.com/schemas/hikari-theme.schema.json",
+  "title": "HikariSub colour theme",
+  "description": "A colour theme file: the four built-in themes and every plugin theme (contributes.themes). Keys marked optional are worked out from others when left out; docs/plugins.md#themes-and-icons gives each rule.",
+  "type": "object",
+  "required": ["type", "roles", "content"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {"type": "string"},
+    "type": {
+      "description": "Which side of Follow system theme the theme sits on, and whether the high-contrast floors apply.",
+      "enum": ["light", "dark", "highContrastLight", "highContrastDark"]
+    },
+    "roles": {
+      "description": "The interface roles of docs/ux/visual-language.md.",
+      "type": "object",
+      "required": ["background", "panel", "raised", "field", "text", "muted", "line", "disabled", "accent", "select", "danger", "warning", "success"],
+      "additionalProperties": false,
+      "properties": {
+        "background": {"$ref": "#/$defs/Opaque"},
+        "panel": {"$ref": "#/$defs/Opaque"},
+        "raised": {"$ref": "#/$defs/Opaque"},
+        "field": {"$ref": "#/$defs/Opaque"},
+        "text": {"$ref": "#/$defs/Opaque"},
+        "muted": {"$ref": "#/$defs/Opaque"},
+        "line": {"$ref": "#/$defs/Opaque"},
+        "control": {"description": "Required in light and dark themes. Optional in high contrast: line.", "$ref": "#/$defs/Opaque"},
+        "disabled": {"$ref": "#/$defs/Opaque"},
+        "accent": {"description": "The accent shown when the user has picked no accent choice.", "$ref": "#/$defs/Opaque"},
+        "onAccent": {"description": "Optional: black or white, whichever contrasts more with accent.", "$ref": "#/$defs/Opaque"},
+        "select": {"$ref": "#/$defs/Opaque"},
+        "hover": {"description": "Optional: text at 5 % (light), 6 % (dark), 8 % (highContrastLight) or 12 % (highContrastDark).", "$ref": "#/$defs/Colour"},
+        "pressed": {"description": "Optional: text at twice hover's alpha.", "$ref": "#/$defs/Colour"},
+        "focus": {"description": "Optional: text.", "$ref": "#/$defs/Opaque"},
+        "danger": {"$ref": "#/$defs/Opaque"},
+        "warning": {"$ref": "#/$defs/Opaque"},
+        "success": {"$ref": "#/$defs/Opaque"}
+      }
+    },
+    "accents": {
+      "description": "Named accent choices for the accent picker. Without them the picker is hidden. One choice must equal roles' accent, onAccent and select; it is the default.",
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "accent", "select"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "maxLength": 32},
+          "title": {"type": "string", "minLength": 1, "maxLength": 64},
+          "accent": {"$ref": "#/$defs/Opaque"},
+          "onAccent": {"description": "Optional, by the same rule as roles.onAccent.", "$ref": "#/$defs/Opaque"},
+          "select": {"$ref": "#/$defs/Opaque"}
+        }
+      }
+    },
+    "userColours": {
+      "description": "Interface roles the user may change on this theme in Settings > Appearance > UI colours.",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 6,
+      "items": {"enum": ["background", "panel", "raised", "field", "text", "muted", "line", "control", "disabled", "accent", "select", "danger", "warning", "success"]}
+    },
+    "content": {
+      "type": "object",
+      "required": ["spellcheck", "grammar", "grid", "syntax", "ports", "audio", "visualTools"],
+      "additionalProperties": false,
+      "properties": {
+        "spellcheck": {"$ref": "#/$defs/Opaque"},
+        "grammar": {"$ref": "#/$defs/Opaque"},
+        "grid": {
+          "type": "object",
+          "required": ["alternate", "warning", "comment", "comparison", "labels"],
+          "additionalProperties": false,
+          "properties": {
+            "alternate": {"$ref": "#/$defs/Colour"},
+            "warning": {"$ref": "#/$defs/Colour"},
+            "comment": {"$ref": "#/$defs/Colour"},
+            "comparison": {
+              "description": "The five Compare colours, in order.",
+              "type": "array",
+              "minItems": 5,
+              "maxItems": 5,
+              "items": {"$ref": "#/$defs/Colour"}
+            },
+            "comparisonSelection": {"description": "Optional: accent at alpha 75.", "$ref": "#/$defs/Colour"},
+            "labels": {
+              "description": "The fill of the Line-number column for each Line state; its text turns black or white to stay readable.",
+              "type": "object",
+              "required": ["normal", "modified", "saved", "doubtful"],
+              "additionalProperties": false,
+              "properties": {
+                "normal": {"$ref": "#/$defs/Colour"},
+                "modified": {"$ref": "#/$defs/Colour"},
+                "saved": {"$ref": "#/$defs/Colour"},
+                "doubtful": {"$ref": "#/$defs/Colour"}
+              }
+            }
+          }
+        },
+        "syntax": {
+          "description": "Line editor highlighting.",
+          "type": "object",
+          "required": ["curlyBraces", "operators", "names", "values", "splitAndDrawings", "templateVariables", "templateCodeMarks", "templateFunctions", "templateKeywords", "templateStrings", "drawingX", "drawingY"],
+          "additionalProperties": false,
+          "properties": {
+            "default": {"description": "Optional: roles.text.", "$ref": "#/$defs/Opaque"},
+            "curlyBraces": {"$ref": "#/$defs/Opaque"},
+            "operators": {"$ref": "#/$defs/Opaque"},
+            "names": {"$ref": "#/$defs/Opaque"},
+            "values": {"$ref": "#/$defs/Opaque"},
+            "splitAndDrawings": {"$ref": "#/$defs/Opaque"},
+            "templateVariables": {"$ref": "#/$defs/Opaque"},
+            "templateCodeMarks": {"$ref": "#/$defs/Opaque"},
+            "templateFunctions": {"$ref": "#/$defs/Opaque"},
+            "templateKeywords": {"$ref": "#/$defs/Opaque"},
+            "templateStrings": {"$ref": "#/$defs/Opaque"},
+            "drawingX": {"$ref": "#/$defs/Opaque"},
+            "drawingY": {"$ref": "#/$defs/Opaque"}
+          }
+        },
+        "ports": {
+          "description": "Node-effect port types.",
+          "type": "object",
+          "required": ["units", "tags", "number", "text", "colour", "point", "bool", "drawing"],
+          "additionalProperties": false,
+          "properties": {
+            "units": {"$ref": "#/$defs/Opaque"},
+            "tags": {"$ref": "#/$defs/Opaque"},
+            "number": {"$ref": "#/$defs/Opaque"},
+            "text": {"$ref": "#/$defs/Opaque"},
+            "colour": {"$ref": "#/$defs/Opaque"},
+            "point": {"$ref": "#/$defs/Opaque"},
+            "bool": {"$ref": "#/$defs/Opaque"},
+            "drawing": {"$ref": "#/$defs/Opaque"}
+          }
+        },
+        "audio": {
+          "description": "The audio display.",
+          "type": "object",
+          "required": ["background", "lineStart", "lineEnd", "inactiveBoundary", "cursor", "secondBoundaries", "keyframe", "inactiveBackground", "waveform", "waveformInactive", "waveformModified", "timescaleBackground", "timescaleText", "spectrumBackground", "spectrumEcho", "spectrumInner", "lineBoundaryMark", "syllableBoundaries", "syllableText"],
+          "additionalProperties": false,
+          "properties": {
+            "background": {"$ref": "#/$defs/Colour"},
+            "lineStart": {"$ref": "#/$defs/Colour"},
+            "lineEnd": {"$ref": "#/$defs/Colour"},
+            "inactiveBoundary": {"$ref": "#/$defs/Colour"},
+            "cursor": {"$ref": "#/$defs/Colour"},
+            "secondBoundaries": {"$ref": "#/$defs/Colour"},
+            "keyframe": {"$ref": "#/$defs/Colour"},
+            "selectionBackground": {"description": "Optional: accent at alpha 55 (0x37).", "$ref": "#/$defs/Colour"},
+            "selectionModified": {"description": "Optional: selectionBackground.", "$ref": "#/$defs/Colour"},
+            "inactiveBackground": {"$ref": "#/$defs/Colour"},
+            "waveform": {"$ref": "#/$defs/Colour"},
+            "waveformInactive": {"$ref": "#/$defs/Colour"},
+            "waveformModified": {"$ref": "#/$defs/Colour"},
+            "waveformSelected": {"description": "Optional: accent.", "$ref": "#/$defs/Colour"},
+            "timescaleBackground": {"$ref": "#/$defs/Colour"},
+            "timescaleText": {"$ref": "#/$defs/Colour"},
+            "spectrumBackground": {"$ref": "#/$defs/Colour"},
+            "spectrumEcho": {"$ref": "#/$defs/Colour"},
+            "spectrumInner": {"$ref": "#/$defs/Colour"},
+            "lineBoundaryMark": {"$ref": "#/$defs/Colour"},
+            "syllableBoundaries": {"$ref": "#/$defs/Colour"},
+            "syllableText": {"$ref": "#/$defs/Colour"}
+          }
+        },
+        "visualTools": {
+          "description": "The handles visual tools draw over the video. Guides, crosshairs, masks and the video background stay fixed.",
+          "type": "object",
+          "required": ["handle", "handleSelected", "handleBorder"],
+          "additionalProperties": false,
+          "properties": {
+            "handle": {"$ref": "#/$defs/Colour"},
+            "handleSelected": {"$ref": "#/$defs/Colour"},
+            "handleBorder": {"$ref": "#/$defs/Colour"}
+          }
+        }
+      }
+    }
+  },
+  "anyOf": [
+    {"properties": {"type": {"enum": ["light", "dark"]}, "roles": {"required": ["control"]}}},
+    {"properties": {"type": {"enum": ["highContrastLight", "highContrastDark"]}}}
+  ],
+  "$defs": {
+    "Opaque": {"type": "string", "pattern": "^#[0-9A-Fa-f]{6}$"},
+    "Colour": {"description": "#RRGGBB, or #RRGGBBAA with alpha.", "type": "string", "pattern": "^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$"}
+  }
+}

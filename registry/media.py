@@ -121,6 +121,27 @@ def check_svg(path: str, data: bytes) -> None:
         raise MediaError(path, problem)
 
 
+_COLOUR_PROPERTIES = ("fill", "stroke", "color", "stop-color", "flood-color", "lighting-color")
+_INTERFACE_COLOURS = ("none", "currentcolor", "inherit")
+
+
+def check_interface_icon(path: str, data: bytes) -> None:
+    """An icon-theme or own icon: the SVG rules, a viewBox of 0 0 16 16, and currentColor only."""
+    check_svg(path, data)
+    root = ET.fromstring(data.decode("utf-8"))
+    try:
+        box = [float(v) for v in (root.get("viewBox") or "").replace(",", " ").split()]
+    except ValueError:
+        box = []
+    if box != [0, 0, 16, 16]:
+        raise MediaError(path, "has no viewBox of 0 0 16 16 on its <svg>")
+    for el in root.iter():
+        for name, value in el.attrib.items():
+            local = _local(name).lower()
+            if local in _COLOUR_PROPERTIES and value.strip().lower() not in _INTERFACE_COLOURS:
+                raise MediaError(path, f"draws {local} in {value.strip()}; an interface icon draws in currentColor only")
+
+
 def check_icon(path: str, data: bytes) -> None:
     if path.endswith(".svg"):
         check_svg(path, data)
