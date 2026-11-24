@@ -1,0 +1,2090 @@
+{
+ "description": "Shared by HikariSub (tests/themes) and registry CI: each theme file and the first problem themes::load reports, or null.",
+ "vectors": [
+  {
+   "name": "built-in Light passes",
+   "theme": {
+    "$schema": "https://hikarisub.altqx.com/schemas/hikari-theme.schema.json",
+    "type": "light",
+    "roles": {
+     "background": "#EEF0F3",
+     "panel": "#FFFFFF",
+     "raised": "#EEF0F3",
+     "field": "#FFFFFF",
+     "text": "#1E2329",
+     "muted": "#56616C",
+     "line": "#DCE0E5",
+     "control": "#7A838D",
+     "disabled": "#7A838D",
+     "accent": "#145C4C",
+     "onAccent": "#FFFFFF",
+     "select": "#D6EBE4",
+     "hover": "#1E23290D",
+     "pressed": "#1E23291A",
+     "danger": "#A51F31",
+     "warning": "#8A5A00",
+     "success": "#008000"
+    },
+    "accents": [
+     {
+      "id": "red",
+      "title": "Red",
+      "accent": "#B3261E",
+      "onAccent": "#FFFFFF",
+      "select": "#EBD7D6"
+     },
+     {
+      "id": "orange",
+      "title": "Orange",
+      "accent": "#9C4600",
+      "onAccent": "#FFFFFF",
+      "select": "#EBDFD6"
+     },
+     {
+      "id": "gold",
+      "title": "Gold",
+      "accent": "#7A5E00",
+      "onAccent": "#FFFFFF",
+      "select": "#EBE6D6"
+     },
+     {
+      "id": "green",
+      "title": "Green",
+      "accent": "#145C4C",
+      "onAccent": "#FFFFFF",
+      "select": "#D6EBE4"
+     },
+     {
+      "id": "blue",
+      "title": "Blue",
+      "accent": "#1D5BA8",
+      "onAccent": "#FFFFFF",
+      "select": "#D6DFEB"
+     },
+     {
+      "id": "purple",
+      "title": "Purple",
+      "accent": "#5B3FB0",
+      "onAccent": "#FFFFFF",
+      "select": "#DBD6EB"
+     },
+     {
+      "id": "pink",
+      "title": "Pink",
+      "accent": "#9E2A73",
+      "onAccent": "#FFFFFF",
+      "select": "#EBD6E3"
+     }
+    ],
+    "content": {
+     "spellcheck": "#D70000",
+     "grammar": "#1A56DB",
+     "grid": {
+      "alternate": "#F0F2F4",
+      "warning": "#F4C7C7",
+      "comment": "#D6E3F5",
+      "comparison": [
+       "#FFFFFF",
+       "#FF000C",
+       "#B7AC00",
+       "#9C0000",
+       "#817900"
+      ],
+      "labels": {
+       "normal": "#9C9C9C",
+       "modified": "#B0ADD8",
+       "saved": "#BFBFBF",
+       "doubtful": "#925B1F"
+      }
+     },
+     "syntax": {
+      "curlyBraces": "#7E3B00",
+      "operators": "#787600",
+      "names": "#787600",
+      "values": "#34C200",
+      "splitAndDrawings": "#817F7F",
+      "templateVariables": "#BDB76B",
+      "templateCodeMarks": "#FB4544",
+      "templateFunctions": "#00C3FF",
+      "templateKeywords": "#8D80D3",
+      "templateStrings": "#11A243",
+      "drawingX": "#00796B",
+      "drawingY": "#AD1457"
+     },
+     "ports": {
+      "units": "#6B3FB0",
+      "tags": "#1E7A4F",
+      "number": "#1F5FAD",
+      "text": "#8A6100",
+      "colour": "#B0306A",
+      "point": "#A04E00",
+      "bool": "#5A6570",
+      "drawing": "#00707F"
+     },
+     "audio": {
+      "background": "#DDE3E8",
+      "lineStart": "#940000",
+      "lineEnd": "#940000",
+      "inactiveBoundary": "#00875A",
+      "cursor": "#4F56D6",
+      "secondBoundaries": "#20283237",
+      "keyframe": "#2E3A46",
+      "inactiveBackground": "#00000018",
+      "waveform": "#5B6774",
+      "waveformInactive": "#9AA5B0",
+      "waveformModified": "#C62828",
+      "timescaleBackground": "#EDF0F3",
+      "timescaleText": "#526170",
+      "spectrumBackground": "#FFFFFF",
+      "spectrumEcho": "#674FD7",
+      "spectrumInner": "#1A1F26",
+      "lineBoundaryMark": "#202832",
+      "syllableBoundaries": "#3A4652",
+      "syllableText": "#E0E3FF"
+     },
+     "visualTools": {
+      "handle": "#121150AA",
+      "handleSelected": "#FCE6B1AA",
+      "handleBorder": "#BB0000"
+     }
+    }
+   },
+   "problem": null
+  },
+  {
+   "name": "built-in Dark passes",
+   "theme": {
+    "$schema": "https://hikarisub.altqx.com/schemas/hikari-theme.schema.json",
+    "type": "dark",
+    "roles": {
+     "background": "#181B20",
+     "panel": "#1E2127",
+     "raised": "#2A2E35",
+     "field": "#15171B",
+     "text": "#E4E7EB",
+     "muted": "#A0A8B2",
+     "line": "#2C3037",
+     "control": "#757E89",
+     "disabled": "#737B85",
+     "accent": "#9CDBC9",
+     "onAccent": "#102C24",
+     "select": "#304C47",
+     "hover": "#E4E7EB0F",
+     "pressed": "#E4E7EB1E",
+     "danger": "#FFADAD",
+     "warning": "#E0A030",
+     "success": "#4DBA4D"
+    },
+    "accents": [
+     {
+      "id": "red",
+      "title": "Red",
+      "accent": "#F4A9A3",
+      "onAccent": "#2C1210",
+      "select": "#4C3230"
+     },
+     {
+      "id": "orange",
+      "title": "Orange",
+      "accent": "#F5BB8A",
+      "onAccent": "#2C1D10",
+      "select": "#4C3D30"
+     },
+     {
+      "id": "gold",
+      "title": "Gold",
+      "accent": "#E3CF7E",
+      "onAccent": "#2C2610",
+      "select": "#4C4630"
+     },
+     {
+      "id": "green",
+      "title": "Green",
+      "accent": "#9CDBC9",
+      "onAccent": "#102C24",
+      "select": "#304C47"
+     },
+     {
+      "id": "blue",
+      "title": "Blue",
+      "accent": "#A6C8F2",
+      "onAccent": "#101D2C",
+      "select": "#303D4C"
+     },
+     {
+      "id": "purple",
+      "title": "Purple",
+      "accent": "#C6B5F4",
+      "onAccent": "#18102C",
+      "select": "#38304C"
+     },
+     {
+      "id": "pink",
+      "title": "Pink",
+      "accent": "#EFAAD3",
+      "onAccent": "#2C1021",
+      "select": "#4C3041"
+     }
+    ],
+    "content": {
+     "spellcheck": "#FF6B6B",
+     "grammar": "#6EA8FE",
+     "grid": {
+      "alternate": "#242A31",
+      "warning": "#7A2E2E",
+      "comment": "#253A57",
+      "comparison": [
+       "#2700FF",
+       "#272B32",
+       "#3A3E45",
+       "#003176",
+       "#3662A1"
+      ],
+      "labels": {
+       "normal": "#2F3136",
+       "modified": "#322F4E",
+       "saved": "#202225",
+       "doubtful": "#925B1F"
+      }
+     },
+     "syntax": {
+      "curlyBraces": "#8791FD",
+      "operators": "#00C3FF",
+      "names": "#00C3FF",
+      "values": "#0076FF",
+      "splitAndDrawings": "#ADABAB",
+      "templateVariables": "#BDB76B",
+      "templateCodeMarks": "#FB4544",
+      "templateFunctions": "#00C3FF",
+      "templateKeywords": "#8D80D3",
+      "templateStrings": "#11A243",
+      "drawingX": "#4EC9B0",
+      "drawingY": "#E5A0D9"
+     },
+     "ports": {
+      "units": "#C9A0FF",
+      "tags": "#7FD6A8",
+      "number": "#8EC5FF",
+      "text": "#F2C46D",
+      "colour": "#FF9EB5",
+      "point": "#FFB37A",
+      "bool": "#B0B8C0",
+      "drawing": "#66D9E8"
+     },
+     "audio": {
+      "background": "#36393E",
+      "lineStart": "#940000",
+      "lineEnd": "#940000",
+      "inactiveBoundary": "#00D77D",
+      "cursor": "#8791FD",
+      "secondBoundaries": "#F4F4F437",
+      "keyframe": "#F4F4F4",
+      "inactiveBackground": "#00000055",
+      "waveform": "#202225",
+      "waveformInactive": "#2F3136",
+      "waveformModified": "#FF6968",
+      "timescaleBackground": "#202225",
+      "timescaleText": "#AEAFB2",
+      "spectrumBackground": "#000000",
+      "spectrumEcho": "#674FD7",
+      "spectrumInner": "#F4F4F4",
+      "lineBoundaryMark": "#FFFFFF",
+      "syllableBoundaries": "#202225",
+      "syllableText": "#8791FD"
+     },
+     "visualTools": {
+      "handle": "#121150AA",
+      "handleSelected": "#FCE6B1AA",
+      "handleBorder": "#BB0000"
+     }
+    }
+   },
+   "problem": null
+  },
+  {
+   "name": "built-in High contrast white passes",
+   "theme": {
+    "$schema": "https://hikarisub.altqx.com/schemas/hikari-theme.schema.json",
+    "type": "highContrastLight",
+    "roles": {
+     "background": "#FFFFFF",
+     "panel": "#FFFFFF",
+     "raised": "#EBEBEB",
+     "field": "#FFFFFF",
+     "text": "#000000",
+     "muted": "#1A1A1A",
+     "line": "#000000",
+     "disabled": "#6E6E6E",
+     "accent": "#0037B3",
+     "select": "#C9DAF8",
+     "danger": "#A00000",
+     "warning": "#6B4500",
+     "success": "#005A00"
+    },
+    "userColours": [
+     "accent",
+     "text",
+     "line"
+    ],
+    "content": {
+     "spellcheck": "#C00000",
+     "grammar": "#0000C8",
+     "grid": {
+      "alternate": "#FFFFFF",
+      "warning": "#FFC0C0",
+      "comment": "#F2E2B0",
+      "comparison": [
+       "#C000C0",
+       "#FFD0D0",
+       "#E0E0E0",
+       "#D0D0FF",
+       "#D0E8FF"
+      ],
+      "labels": {
+       "normal": "#9C9C9C",
+       "modified": "#B0ADD8",
+       "saved": "#BFBFBF",
+       "doubtful": "#925B1F"
+      }
+     },
+     "syntax": {
+      "curlyBraces": "#7A3E00",
+      "operators": "#005A9E",
+      "names": "#005A9E",
+      "values": "#006400",
+      "splitAndDrawings": "#595959",
+      "templateVariables": "#6B5E00",
+      "templateCodeMarks": "#B00000",
+      "templateFunctions": "#005A9E",
+      "templateKeywords": "#5B2DA8",
+      "templateStrings": "#00663A",
+      "drawingX": "#00695C",
+      "drawingY": "#9C0060"
+     },
+     "ports": {
+      "units": "#000000",
+      "tags": "#000000",
+      "number": "#000000",
+      "text": "#000000",
+      "colour": "#000000",
+      "point": "#000000",
+      "bool": "#000000",
+      "drawing": "#000000"
+     },
+     "audio": {
+      "background": "#FFFFFF",
+      "lineStart": "#C00000",
+      "lineEnd": "#C00000",
+      "inactiveBoundary": "#007A3D",
+      "cursor": "#8000C0",
+      "secondBoundaries": "#00000060",
+      "keyframe": "#000000",
+      "inactiveBackground": "#00000022",
+      "waveform": "#303030",
+      "waveformInactive": "#8C8C8C",
+      "waveformModified": "#C00000",
+      "timescaleBackground": "#FFFFFF",
+      "timescaleText": "#000000",
+      "spectrumBackground": "#FFFFFF",
+      "spectrumEcho": "#0050C8",
+      "spectrumInner": "#000000",
+      "lineBoundaryMark": "#000000",
+      "syllableBoundaries": "#000000",
+      "syllableText": "#FFFFFF"
+     },
+     "visualTools": {
+      "handle": "#121150AA",
+      "handleSelected": "#FCE6B1AA",
+      "handleBorder": "#BB0000"
+     }
+    }
+   },
+   "problem": null
+  },
+  {
+   "name": "built-in High contrast black passes",
+   "theme": {
+    "$schema": "https://hikarisub.altqx.com/schemas/hikari-theme.schema.json",
+    "type": "highContrastDark",
+    "roles": {
+     "background": "#000000",
+     "panel": "#080808",
+     "raised": "#151515",
+     "field": "#000000",
+     "text": "#FFFFFF",
+     "muted": "#EEEEEE",
+     "line": "#FFFFFF",
+     "disabled": "#8C8C8C",
+     "accent": "#FFFF00",
+     "select": "#253F60",
+     "danger": "#FFADAD",
+     "warning": "#FFD54A",
+     "success": "#7CFC7C"
+    },
+    "userColours": [
+     "accent",
+     "text",
+     "line"
+    ],
+    "content": {
+     "spellcheck": "#FF6060",
+     "grammar": "#FFFF00",
+     "grid": {
+      "alternate": "#000000",
+      "warning": "#800000",
+      "comment": "#403400",
+      "comparison": [
+       "#FF00FF",
+       "#3A0000",
+       "#303030",
+       "#000060",
+       "#003060"
+      ],
+      "labels": {
+       "normal": "#2F3136",
+       "modified": "#322F4E",
+       "saved": "#202225",
+       "doubtful": "#925B1F"
+      }
+     },
+     "syntax": {
+      "curlyBraces": "#FFB060",
+      "operators": "#60D0FF",
+      "names": "#60D0FF",
+      "values": "#7CFC7C",
+      "splitAndDrawings": "#BEBEBE",
+      "templateVariables": "#F0E68C",
+      "templateCodeMarks": "#FF6060",
+      "templateFunctions": "#60D0FF",
+      "templateKeywords": "#C8A8FF",
+      "templateStrings": "#A0E0A0",
+      "drawingX": "#40E0D0",
+      "drawingY": "#FF80C0"
+     },
+     "ports": {
+      "units": "#FFFFFF",
+      "tags": "#FFFFFF",
+      "number": "#FFFFFF",
+      "text": "#FFFFFF",
+      "colour": "#FFFFFF",
+      "point": "#FFFFFF",
+      "bool": "#FFFFFF",
+      "drawing": "#FFFFFF"
+     },
+     "audio": {
+      "background": "#000000",
+      "lineStart": "#FF4040",
+      "lineEnd": "#FF4040",
+      "inactiveBoundary": "#00FF80",
+      "cursor": "#00FFFF",
+      "secondBoundaries": "#FFFFFF60",
+      "keyframe": "#FFFFFF",
+      "inactiveBackground": "#00000055",
+      "waveform": "#C8C8C8",
+      "waveformInactive": "#6E6E6E",
+      "waveformModified": "#FF6968",
+      "timescaleBackground": "#000000",
+      "timescaleText": "#FFFFFF",
+      "spectrumBackground": "#000000",
+      "spectrumEcho": "#00C8FF",
+      "spectrumInner": "#FFFFFF",
+      "lineBoundaryMark": "#FFFFFF",
+      "syllableBoundaries": "#FFFFFF",
+      "syllableText": "#000000"
+     },
+     "visualTools": {
+      "handle": "#121150AA",
+      "handleSelected": "#FCE6B1AA",
+      "handleBorder": "#BB0000"
+     }
+    }
+   },
+   "problem": null
+  },
+  {
+   "name": "muted below 4.5:1 in a dark theme",
+   "theme": {
+    "$schema": "https://hikarisub.altqx.com/schemas/hikari-theme.schema.json",
+    "type": "dark",
+    "roles": {
+     "background": "#181B20",
+     "panel": "#1E2127",
+     "raised": "#2A2E35",
+     "field": "#15171B",
+     "text": "#E4E7EB",
+     "muted": "#505050",
+     "line": "#2C3037",
+     "control": "#757E89",
+     "disabled": "#737B85",
+     "accent": "#9CDBC9",
+     "onAccent": "#102C24",
+     "select": "#304C47",
+     "hover": "#E4E7EB0F",
+     "pressed": "#E4E7EB1E",
+     "danger": "#FFADAD",
+     "warning": "#E0A030",
+     "success": "#4DBA4D"
+    },
+    "accents": [
+     {
+      "id": "red",
+      "title": "Red",
+      "accent": "#F4A9A3",
+      "onAccent": "#2C1210",
+      "select": "#4C3230"
+     },
+     {
+      "id": "orange",
+      "title": "Orange",
+      "accent": "#F5BB8A",
+      "onAccent": "#2C1D10",
+      "select": "#4C3D30"
+     },
+     {
+      "id": "gold",
+      "title": "Gold",
+      "accent": "#E3CF7E",
+      "onAccent": "#2C2610",
+      "select": "#4C4630"
+     },
+     {
+      "id": "green",
+      "title": "Green",
+      "accent": "#9CDBC9",
+      "onAccent": "#102C24",
+      "select": "#304C47"
+     },
+     {
+      "id": "blue",
+      "title": "Blue",
+      "accent": "#A6C8F2",
+      "onAccent": "#101D2C",
+      "select": "#303D4C"
+     },
+     {
+      "id": "purple",
+      "title": "Purple",
+      "accent": "#C6B5F4",
+      "onAccent": "#18102C",
+      "select": "#38304C"
+     },
+     {
+      "id": "pink",
+      "title": "Pink",
+      "accent": "#EFAAD3",
+      "onAccent": "#2C1021",
+      "select": "#4C3041"
+     }
+    ],
+    "content": {
+     "spellcheck": "#FF6B6B",
+     "grammar": "#6EA8FE",
+     "grid": {
+      "alternate": "#242A31",
+      "warning": "#7A2E2E",
+      "comment": "#253A57",
+      "comparison": [
+       "#2700FF",
+       "#272B32",
+       "#3A3E45",
+       "#003176",
+       "#3662A1"
+      ],
+      "labels": {
+       "normal": "#2F3136",
+       "modified": "#322F4E",
+       "saved": "#202225",
+       "doubtful": "#925B1F"
+      }
+     },
+     "syntax": {
+      "curlyBraces": "#8791FD",
+      "operators": "#00C3FF",
+      "names": "#00C3FF",
+      "values": "#0076FF",
+      "splitAndDrawings": "#ADABAB",
+      "templateVariables": "#BDB76B",
+      "templateCodeMarks": "#FB4544",
+      "templateFunctions": "#00C3FF",
+      "templateKeywords": "#8D80D3",
+      "templateStrings": "#11A243",
+      "drawingX": "#4EC9B0",
+      "drawingY": "#E5A0D9"
+     },
+     "ports": {
+      "units": "#C9A0FF",
+      "tags": "#7FD6A8",
+      "number": "#8EC5FF",
+      "text": "#F2C46D",
+      "colour": "#FF9EB5",
+      "point": "#FFB37A",
+      "bool": "#B0B8C0",
+      "drawing": "#66D9E8"
+     },
+     "audio": {
+      "background": "#36393E",
+      "lineStart": "#940000",
+      "lineEnd": "#940000",
+      "inactiveBoundary": "#00D77D",
+      "cursor": "#8791FD",
+      "secondBoundaries": "#F4F4F437",
+      "keyframe": "#F4F4F4",
+      "inactiveBackground": "#00000055",
+      "waveform": "#202225",
+      "waveformInactive": "#2F3136",
+      "waveformModified": "#FF6968",
+      "timescaleBackground": "#202225",
+      "timescaleText": "#AEAFB2",
+      "spectrumBackground": "#000000",
+      "spectrumEcho": "#674FD7",
+      "spectrumInner": "#F4F4F4",
+      "lineBoundaryMark": "#FFFFFF",
+      "syllableBoundaries": "#202225",
+      "syllableText": "#8791FD"
+     },
+     "visualTools": {
+      "handle": "#121150AA",
+      "handleSelected": "#FCE6B1AA",
+      "handleBorder": "#BB0000"
+     }
+    }
+   },
+   "problem": {
+    "stage": "contrast",
+    "path": "/roles/muted",
+    "message": "/roles/muted #505050 on background #181B20 with the accent red measures 2.14:1, below 4.50:1"
+   }
+  },
+  {
+   "name": "an accent choice below 4.5:1",
+   "theme": {
+    "$schema": "https://hikarisub.altqx.com/schemas/hikari-theme.schema.json",
+    "type": "dark",
+    "roles": {
+     "background": "#181B20",
+     "panel": "#1E2127",
+     "raised": "#2A2E35",
+     "field": "#15171B",
+     "text": "#E4E7EB",
+     "muted": "#A0A8B2",
+     "line": "#2C3037",
+     "control": "#757E89",
+     "disabled": "#737B85",
+     "accent": "#9CDBC9",
+     "onAccent": "#102C24",
+     "select": "#304C47",
+     "hover": "#E4E7EB0F",
+     "pressed": "#E4E7EB1E",
+     "danger": "#FFADAD",
+     "warning": "#E0A030",
+     "success": "#4DBA4D"
+    },
+    "accents": [
+     {
+      "id": "red",
+      "title": "Red",
+      "accent": "#303030",
+      "onAccent": "#2C1210",
+      "select": "#4C3230"
+     },
+     {
+      "id": "orange",
+      "title": "Orange",
+      "accent": "#F5BB8A",
+      "onAccent": "#2C1D10",
+      "select": "#4C3D30"
+     },
+     {
+      "id": "gold",
+      "title": "Gold",
+      "accent": "#E3CF7E",
+      "onAccent": "#2C2610",
+      "select": "#4C4630"
+     },
+     {
+      "id": "green",
+      "title": "Green",
+      "accent": "#9CDBC9",
+      "onAccent": "#102C24",
+      "select": "#304C47"
+     },
+     {
+      "id": "blue",
+      "title": "Blue",
+      "accent": "#A6C8F2",
+      "onAccent": "#101D2C",
+      "select": "#303D4C"
+     },
+     {
+      "id": "purple",
+      "title": "Purple",
+      "accent": "#C6B5F4",
+      "onAccent": "#18102C",
+      "select": "#38304C"
+     },
+     {
+      "id": "pink",
+      "title": "Pink",
+      "accent": "#EFAAD3",
+      "onAccent": "#2C1021",
+      "select": "#4C3041"
+     }
+    ],
+    "content": {
+     "spellcheck": "#FF6B6B",
+     "grammar": "#6EA8FE",
+     "grid": {
+      "alternate": "#242A31",
+      "warning": "#7A2E2E",
+      "comment": "#253A57",
+      "comparison": [
+       "#2700FF",
+       "#272B32",
+       "#3A3E45",
+       "#003176",
+       "#3662A1"
+      ],
+      "labels": {
+       "normal": "#2F3136",
+       "modified": "#322F4E",
+       "saved": "#202225",
+       "doubtful": "#925B1F"
+      }
+     },
+     "syntax": {
+      "curlyBraces": "#8791FD",
+      "operators": "#00C3FF",
+      "names": "#00C3FF",
+      "values": "#0076FF",
+      "splitAndDrawings": "#ADABAB",
+      "templateVariables": "#BDB76B",
+      "templateCodeMarks": "#FB4544",
+      "templateFunctions": "#00C3FF",
+      "templateKeywords": "#8D80D3",
+      "templateStrings": "#11A243",
+      "drawingX": "#4EC9B0",
+      "drawingY": "#E5A0D9"
+     },
+     "ports": {
+      "units": "#C9A0FF",
+      "tags": "#7FD6A8",
+      "number": "#8EC5FF",
+      "text": "#F2C46D",
+      "colour": "#FF9EB5",
+      "point": "#FFB37A",
+      "bool": "#B0B8C0",
+      "drawing": "#66D9E8"
+     },
+     "audio": {
+      "background": "#36393E",
+      "lineStart": "#940000",
+      "lineEnd": "#940000",
+      "inactiveBoundary": "#00D77D",
+      "cursor": "#8791FD",
+      "secondBoundaries": "#F4F4F437",
+      "keyframe": "#F4F4F4",
+      "inactiveBackground": "#00000055",
+      "waveform": "#202225",
+      "waveformInactive": "#2F3136",
+      "waveformModified": "#FF6968",
+      "timescaleBackground": "#202225",
+      "timescaleText": "#AEAFB2",
+      "spectrumBackground": "#000000",
+      "spectrumEcho": "#674FD7",
+      "spectrumInner": "#F4F4F4",
+      "lineBoundaryMark": "#FFFFFF",
+      "syllableBoundaries": "#202225",
+      "syllableText": "#8791FD"
+     },
+     "visualTools": {
+      "handle": "#121150AA",
+      "handleSelected": "#FCE6B1AA",
+      "handleBorder": "#BB0000"
+     }
+    }
+   },
+   "problem": {
+    "stage": "contrast",
+    "path": "/roles/accent",
+    "message": "/roles/accent #303030 on background #181B20 with the accent red measures 1.30:1, below 4.50:1"
+   }
+  },
+  {
+   "name": "onAccent below 4.5:1 on the accent",
+   "theme": {
+    "$schema": "https://hikarisub.altqx.com/schemas/hikari-theme.schema.json",
+    "type": "dark",
+    "roles": {
+     "background": "#181B20",
+     "panel": "#1E2127",
+     "raised": "#2A2E35",
+     "field": "#15171B",
+     "text": "#E4E7EB",
+     "muted": "#A0A8B2",
+     "line": "#2C3037",
+     "control": "#757E89",
+     "disabled": "#737B85",
+     "accent": "#9CDBC9",
+     "onAccent": "#102C24",
+     "select": "#304C47",
+     "hover": "#E4E7EB0F",
+     "pressed": "#E4E7EB1E",
+     "danger": "#FFADAD",
+     "warning": "#E0A030",
+     "success": "#4DBA4D"
+    },
+    "accents": [
+     {
+      "id": "red",
+      "title": "Red",
+      "accent": "#F4A9A3",
+      "onAccent": "#C08080",
+      "select": "#4C3230"
+     },
+     {
+      "id": "orange",
+      "title": "Orange",
+      "accent": "#F5BB8A",
+      "onAccent": "#2C1D10",
+      "select": "#4C3D30"
+     },
+     {
+      "id": "gold",
+      "title": "Gold",
+      "accent": "#E3CF7E",
+      "onAccent": "#2C2610",
+      "select": "#4C4630"
+     },
+     {
+      "id": "green",
+      "title": "Green",
+      "accent": "#9CDBC9",
+      "onAccent": "#102C24",
+      "select": "#304C47"
+     },
+     {
+      "id": "blue",
+      "title": "Blue",
+      "accent": "#A6C8F2",
+      "onAccent": "#101D2C",
+      "select": "#303D4C"
+     },
+     {
+      "id": "purple",
+      "title": "Purple",
+      "accent": "#C6B5F4",
+      "onAccent": "#18102C",
+      "select": "#38304C"
+     },
+     {
+      "id": "pink",
+      "title": "Pink",
+      "accent": "#EFAAD3",
+      "onAccent": "#2C1021",
+      "select": "#4C3041"
+     }
+    ],
+    "content": {
+     "spellcheck": "#FF6B6B",
+     "grammar": "#6EA8FE",
+     "grid": {
+      "alternate": "#242A31",
+      "warning": "#7A2E2E",
+      "comment": "#253A57",
+      "comparison": [
+       "#2700FF",
+       "#272B32",
+       "#3A3E45",
+       "#003176",
+       "#3662A1"
+      ],
+      "labels": {
+       "normal": "#2F3136",
+       "modified": "#322F4E",
+       "saved": "#202225",
+       "doubtful": "#925B1F"
+      }
+     },
+     "syntax": {
+      "curlyBraces": "#8791FD",
+      "operators": "#00C3FF",
+      "names": "#00C3FF",
+      "values": "#0076FF",
+      "splitAndDrawings": "#ADABAB",
+      "templateVariables": "#BDB76B",
+      "templateCodeMarks": "#FB4544",
+      "templateFunctions": "#00C3FF",
+      "templateKeywords": "#8D80D3",
+      "templateStrings": "#11A243",
+      "drawingX": "#4EC9B0",
+      "drawingY": "#E5A0D9"
+     },
+     "ports": {
+      "units": "#C9A0FF",
+      "tags": "#7FD6A8",
+      "number": "#8EC5FF",
+      "text": "#F2C46D",
+      "colour": "#FF9EB5",
+      "point": "#FFB37A",
+      "bool": "#B0B8C0",
+      "drawing": "#66D9E8"
+     },
+     "audio": {
+      "background": "#36393E",
+      "lineStart": "#940000",
+      "lineEnd": "#940000",
+      "inactiveBoundary": "#00D77D",
+      "cursor": "#8791FD",
+      "secondBoundaries": "#F4F4F437",
+      "keyframe": "#F4F4F4",
+      "inactiveBackground": "#00000055",
+      "waveform": "#202225",
+      "waveformInactive": "#2F3136",
+      "waveformModified": "#FF6968",
+      "timescaleBackground": "#202225",
+      "timescaleText": "#AEAFB2",
+      "spectrumBackground": "#000000",
+      "spectrumEcho": "#674FD7",
+      "spectrumInner": "#F4F4F4",
+      "lineBoundaryMark": "#FFFFFF",
+      "syllableBoundaries": "#202225",
+      "syllableText": "#8791FD"
+     },
+     "visualTools": {
+      "handle": "#121150AA",
+      "handleSelected": "#FCE6B1AA",
+      "handleBorder": "#BB0000"
+     }
+    }
+   },
+   "problem": {
+    "stage": "contrast",
+    "path": "/roles/onAccent",
+    "message": "/roles/onAccent #C08080 on accent #F4A9A3 with the accent red measures 1.66:1, below 4.50:1"
+   }
+  },
+  {
+   "name": "disabled too close to text",
+   "theme": {
+    "$schema": "https://hikarisub.altqx.com/schemas/hikari-theme.schema.json",
+    "type": "light",
+    "roles": {
+     "background": "#EEF0F3",
+     "panel": "#FFFFFF",
+     "raised": "#EEF0F3",
+     "field": "#FFFFFF",
+     "text": "#1E2329",
+     "muted": "#56616C",
+     "line": "#DCE0E5",
+     "control": "#7A838D",
+     "disabled": "#3A4048",
+     "accent": "#145C4C",
+     "onAccent": "#FFFFFF",
+     "select": "#D6EBE4",
+     "hover": "#1E23290D",
+     "pressed": "#1E23291A",
+     "danger": "#A51F31",
+     "warning": "#8A5A00",
+     "success": "#008000"
+    },
+    "accents": [
+     {
+      "id": "red",
+      "title": "Red",
+      "accent": "#B3261E",
+      "onAccent": "#FFFFFF",
+      "select": "#EBD7D6"
+     },
+     {
+      "id": "orange",
+      "title": "Orange",
+      "accent": "#9C4600",
+      "onAccent": "#FFFFFF",
+      "select": "#EBDFD6"
+     },
+     {
+      "id": "gold",
+      "title": "Gold",
+      "accent": "#7A5E00",
+      "onAccent": "#FFFFFF",
+      "select": "#EBE6D6"
+     },
+     {
+      "id": "green",
+      "title": "Green",
+      "accent": "#145C4C",
+      "onAccent": "#FFFFFF",
+      "select": "#D6EBE4"
+     },
+     {
+      "id": "blue",
+      "title": "Blue",
+      "accent": "#1D5BA8",
+      "onAccent": "#FFFFFF",
+      "select": "#D6DFEB"
+     },
+     {
+      "id": "purple",
+      "title": "Purple",
+      "accent": "#5B3FB0",
+      "onAccent": "#FFFFFF",
+      "select": "#DBD6EB"
+     },
+     {
+      "id": "pink",
+      "title": "Pink",
+      "accent": "#9E2A73",
+      "onAccent": "#FFFFFF",
+      "select": "#EBD6E3"
+     }
+    ],
+    "content": {
+     "spellcheck": "#D70000",
+     "grammar": "#1A56DB",
+     "grid": {
+      "alternate": "#F0F2F4",
+      "warning": "#F4C7C7",
+      "comment": "#D6E3F5",
+      "comparison": [
+       "#FFFFFF",
+       "#FF000C",
+       "#B7AC00",
+       "#9C0000",
+       "#817900"
+      ],
+      "labels": {
+       "normal": "#9C9C9C",
+       "modified": "#B0ADD8",
+       "saved": "#BFBFBF",
+       "doubtful": "#925B1F"
+      }
+     },
+     "syntax": {
+      "curlyBraces": "#7E3B00",
+      "operators": "#787600",
+      "names": "#787600",
+      "values": "#34C200",
+      "splitAndDrawings": "#817F7F",
+      "templateVariables": "#BDB76B",
+      "templateCodeMarks": "#FB4544",
+      "templateFunctions": "#00C3FF",
+      "templateKeywords": "#8D80D3",
+      "templateStrings": "#11A243",
+      "drawingX": "#00796B",
+      "drawingY": "#AD1457"
+     },
+     "ports": {
+      "units": "#6B3FB0",
+      "tags": "#1E7A4F",
+      "number": "#1F5FAD",
+      "text": "#8A6100",
+      "colour": "#B0306A",
+      "point": "#A04E00",
+      "bool": "#5A6570",
+      "drawing": "#00707F"
+     },
+     "audio": {
+      "background": "#DDE3E8",
+      "lineStart": "#940000",
+      "lineEnd": "#940000",
+      "inactiveBoundary": "#00875A",
+      "cursor": "#4F56D6",
+      "secondBoundaries": "#20283237",
+      "keyframe": "#2E3A46",
+      "inactiveBackground": "#00000018",
+      "waveform": "#5B6774",
+      "waveformInactive": "#9AA5B0",
+      "waveformModified": "#C62828",
+      "timescaleBackground": "#EDF0F3",
+      "timescaleText": "#526170",
+      "spectrumBackground": "#FFFFFF",
+      "spectrumEcho": "#674FD7",
+      "spectrumInner": "#1A1F26",
+      "lineBoundaryMark": "#202832",
+      "syllableBoundaries": "#3A4652",
+      "syllableText": "#E0E3FF"
+     },
+     "visualTools": {
+      "handle": "#121150AA",
+      "handleSelected": "#FCE6B1AA",
+      "handleBorder": "#BB0000"
+     }
+    }
+   },
+   "problem": {
+    "stage": "contrast",
+    "path": "/roles/disabled",
+    "message": "/roles/disabled #3A4048 on text #1E2329 with the accent red measures 1.51:1, below 2.00:1"
+   }
+  },
+  {
+   "name": "text below 7:1 in high contrast",
+   "theme": {
+    "$schema": "https://hikarisub.altqx.com/schemas/hikari-theme.schema.json",
+    "type": "highContrastDark",
+    "roles": {
+     "background": "#000000",
+     "panel": "#080808",
+     "raised": "#151515",
+     "field": "#000000",
+     "text": "#A0A0A0",
+     "muted": "#EEEEEE",
+     "line": "#FFFFFF",
+     "disabled": "#8C8C8C",
+     "accent": "#FFFF00",
+     "select": "#253F60",
+     "danger": "#FFADAD",
+     "warning": "#FFD54A",
+     "success": "#7CFC7C"
+    },
+    "userColours": [
+     "accent",
+     "text",
+     "line"
+    ],
+    "content": {
+     "spellcheck": "#FF6060",
+     "grammar": "#FFFF00",
+     "grid": {
+      "alternate": "#000000",
+      "warning": "#800000",
+      "comment": "#403400",
+      "comparison": [
+       "#FF00FF",
+       "#3A0000",
+       "#303030",
+       "#000060",
+       "#003060"
+      ],
+      "labels": {
+       "normal": "#2F3136",
+       "modified": "#322F4E",
+       "saved": "#202225",
+       "doubtful": "#925B1F"
+      }
+     },
+     "syntax": {
+      "curlyBraces": "#FFB060",
+      "operators": "#60D0FF",
+      "names": "#60D0FF",
+      "values": "#7CFC7C",
+      "splitAndDrawings": "#BEBEBE",
+      "templateVariables": "#F0E68C",
+      "templateCodeMarks": "#FF6060",
+      "templateFunctions": "#60D0FF",
+      "templateKeywords": "#C8A8FF",
+      "templateStrings": "#A0E0A0",
+      "drawingX": "#40E0D0",
+      "drawingY": "#FF80C0"
+     },
+     "ports": {
+      "units": "#FFFFFF",
+      "tags": "#FFFFFF",
+      "number": "#FFFFFF",
+      "text": "#FFFFFF",
+      "colour": "#FFFFFF",
+      "point": "#FFFFFF",
+      "bool": "#FFFFFF",
+      "drawing": "#FFFFFF"
+     },
+     "audio": {
+      "background": "#000000",
+      "lineStart": "#FF4040",
+      "lineEnd": "#FF4040",
+      "inactiveBoundary": "#00FF80",
+      "cursor": "#00FFFF",
+      "secondBoundaries": "#FFFFFF60",
+      "keyframe": "#FFFFFF",
+      "inactiveBackground": "#00000055",
+      "waveform": "#C8C8C8",
+      "waveformInactive": "#6E6E6E",
+      "waveformModified": "#FF6968",
+      "timescaleBackground": "#000000",
+      "timescaleText": "#FFFFFF",
+      "spectrumBackground": "#000000",
+      "spectrumEcho": "#00C8FF",
+      "spectrumInner": "#FFFFFF",
+      "lineBoundaryMark": "#FFFFFF",
+      "syllableBoundaries": "#FFFFFF",
+      "syllableText": "#000000"
+     },
+     "visualTools": {
+      "handle": "#121150AA",
+      "handleSelected": "#FCE6B1AA",
+      "handleBorder": "#BB0000"
+     }
+    }
+   },
+   "problem": {
+    "stage": "contrast",
+    "path": "/roles/text",
+    "message": "/roles/text #A0A0A0 on raised #151515 measures 6.98:1, below 7.00:1"
+   }
+  },
+  {
+   "name": "line below 7:1 in high contrast",
+   "theme": {
+    "$schema": "https://hikarisub.altqx.com/schemas/hikari-theme.schema.json",
+    "type": "highContrastDark",
+    "roles": {
+     "background": "#000000",
+     "panel": "#080808",
+     "raised": "#151515",
+     "field": "#000000",
+     "text": "#FFFFFF",
+     "muted": "#EEEEEE",
+     "line": "#666666",
+     "disabled": "#8C8C8C",
+     "accent": "#FFFF00",
+     "select": "#253F60",
+     "danger": "#FFADAD",
+     "warning": "#FFD54A",
+     "success": "#7CFC7C"
+    },
+    "userColours": [
+     "accent",
+     "text",
+     "line"
+    ],
+    "content": {
+     "spellcheck": "#FF6060",
+     "grammar": "#FFFF00",
+     "grid": {
+      "alternate": "#000000",
+      "warning": "#800000",
+      "comment": "#403400",
+      "comparison": [
+       "#FF00FF",
+       "#3A0000",
+       "#303030",
+       "#000060",
+       "#003060"
+      ],
+      "labels": {
+       "normal": "#2F3136",
+       "modified": "#322F4E",
+       "saved": "#202225",
+       "doubtful": "#925B1F"
+      }
+     },
+     "syntax": {
+      "curlyBraces": "#FFB060",
+      "operators": "#60D0FF",
+      "names": "#60D0FF",
+      "values": "#7CFC7C",
+      "splitAndDrawings": "#BEBEBE",
+      "templateVariables": "#F0E68C",
+      "templateCodeMarks": "#FF6060",
+      "templateFunctions": "#60D0FF",
+      "templateKeywords": "#C8A8FF",
+      "templateStrings": "#A0E0A0",
+      "drawingX": "#40E0D0",
+      "drawingY": "#FF80C0"
+     },
+     "ports": {
+      "units": "#FFFFFF",
+      "tags": "#FFFFFF",
+      "number": "#FFFFFF",
+      "text": "#FFFFFF",
+      "colour": "#FFFFFF",
+      "point": "#FFFFFF",
+      "bool": "#FFFFFF",
+      "drawing": "#FFFFFF"
+     },
+     "audio": {
+      "background": "#000000",
+      "lineStart": "#FF4040",
+      "lineEnd": "#FF4040",
+      "inactiveBoundary": "#00FF80",
+      "cursor": "#00FFFF",
+      "secondBoundaries": "#FFFFFF60",
+      "keyframe": "#FFFFFF",
+      "inactiveBackground": "#00000055",
+      "waveform": "#C8C8C8",
+      "waveformInactive": "#6E6E6E",
+      "waveformModified": "#FF6968",
+      "timescaleBackground": "#000000",
+      "timescaleText": "#FFFFFF",
+      "spectrumBackground": "#000000",
+      "spectrumEcho": "#00C8FF",
+      "spectrumInner": "#FFFFFF",
+      "lineBoundaryMark": "#FFFFFF",
+      "syllableBoundaries": "#FFFFFF",
+      "syllableText": "#000000"
+     },
+     "visualTools": {
+      "handle": "#121150AA",
+      "handleSelected": "#FCE6B1AA",
+      "handleBorder": "#BB0000"
+     }
+    }
+   },
+   "problem": {
+    "stage": "contrast",
+    "path": "/roles/line",
+    "message": "/roles/line #666666 on background #000000 measures 3.65:1, below 7.00:1"
+   }
+  },
+  {
+   "name": "spellcheck below 3:1 on field",
+   "theme": {
+    "$schema": "https://hikarisub.altqx.com/schemas/hikari-theme.schema.json",
+    "type": "light",
+    "roles": {
+     "background": "#EEF0F3",
+     "panel": "#FFFFFF",
+     "raised": "#EEF0F3",
+     "field": "#FFFFFF",
+     "text": "#1E2329",
+     "muted": "#56616C",
+     "line": "#DCE0E5",
+     "control": "#7A838D",
+     "disabled": "#7A838D",
+     "accent": "#145C4C",
+     "onAccent": "#FFFFFF",
+     "select": "#D6EBE4",
+     "hover": "#1E23290D",
+     "pressed": "#1E23291A",
+     "danger": "#A51F31",
+     "warning": "#8A5A00",
+     "success": "#008000"
+    },
+    "accents": [
+     {
+      "id": "red",
+      "title": "Red",
+      "accent": "#B3261E",
+      "onAccent": "#FFFFFF",
+      "select": "#EBD7D6"
+     },
+     {
+      "id": "orange",
+      "title": "Orange",
+      "accent": "#9C4600",
+      "onAccent": "#FFFFFF",
+      "select": "#EBDFD6"
+     },
+     {
+      "id": "gold",
+      "title": "Gold",
+      "accent": "#7A5E00",
+      "onAccent": "#FFFFFF",
+      "select": "#EBE6D6"
+     },
+     {
+      "id": "green",
+      "title": "Green",
+      "accent": "#145C4C",
+      "onAccent": "#FFFFFF",
+      "select": "#D6EBE4"
+     },
+     {
+      "id": "blue",
+      "title": "Blue",
+      "accent": "#1D5BA8",
+      "onAccent": "#FFFFFF",
+      "select": "#D6DFEB"
+     },
+     {
+      "id": "purple",
+      "title": "Purple",
+      "accent": "#5B3FB0",
+      "onAccent": "#FFFFFF",
+      "select": "#DBD6EB"
+     },
+     {
+      "id": "pink",
+      "title": "Pink",
+      "accent": "#9E2A73",
+      "onAccent": "#FFFFFF",
+      "select": "#EBD6E3"
+     }
+    ],
+    "content": {
+     "spellcheck": "#F0D0D0",
+     "grammar": "#1A56DB",
+     "grid": {
+      "alternate": "#F0F2F4",
+      "warning": "#F4C7C7",
+      "comment": "#D6E3F5",
+      "comparison": [
+       "#FFFFFF",
+       "#FF000C",
+       "#B7AC00",
+       "#9C0000",
+       "#817900"
+      ],
+      "labels": {
+       "normal": "#9C9C9C",
+       "modified": "#B0ADD8",
+       "saved": "#BFBFBF",
+       "doubtful": "#925B1F"
+      }
+     },
+     "syntax": {
+      "curlyBraces": "#7E3B00",
+      "operators": "#787600",
+      "names": "#787600",
+      "values": "#34C200",
+      "splitAndDrawings": "#817F7F",
+      "templateVariables": "#BDB76B",
+      "templateCodeMarks": "#FB4544",
+      "templateFunctions": "#00C3FF",
+      "templateKeywords": "#8D80D3",
+      "templateStrings": "#11A243",
+      "drawingX": "#00796B",
+      "drawingY": "#AD1457"
+     },
+     "ports": {
+      "units": "#6B3FB0",
+      "tags": "#1E7A4F",
+      "number": "#1F5FAD",
+      "text": "#8A6100",
+      "colour": "#B0306A",
+      "point": "#A04E00",
+      "bool": "#5A6570",
+      "drawing": "#00707F"
+     },
+     "audio": {
+      "background": "#DDE3E8",
+      "lineStart": "#940000",
+      "lineEnd": "#940000",
+      "inactiveBoundary": "#00875A",
+      "cursor": "#4F56D6",
+      "secondBoundaries": "#20283237",
+      "keyframe": "#2E3A46",
+      "inactiveBackground": "#00000018",
+      "waveform": "#5B6774",
+      "waveformInactive": "#9AA5B0",
+      "waveformModified": "#C62828",
+      "timescaleBackground": "#EDF0F3",
+      "timescaleText": "#526170",
+      "spectrumBackground": "#FFFFFF",
+      "spectrumEcho": "#674FD7",
+      "spectrumInner": "#1A1F26",
+      "lineBoundaryMark": "#202832",
+      "syllableBoundaries": "#3A4652",
+      "syllableText": "#E0E3FF"
+     },
+     "visualTools": {
+      "handle": "#121150AA",
+      "handleSelected": "#FCE6B1AA",
+      "handleBorder": "#BB0000"
+     }
+    }
+   },
+   "problem": {
+    "stage": "contrast",
+    "path": "/content/spellcheck",
+    "message": "/content/spellcheck #F0D0D0 on field #FFFFFF with the accent red measures 1.43:1, below 3.00:1"
+   }
+  },
+  {
+   "name": "the waveform below 3:1 in a light theme",
+   "theme": {
+    "$schema": "https://hikarisub.altqx.com/schemas/hikari-theme.schema.json",
+    "type": "light",
+    "roles": {
+     "background": "#EEF0F3",
+     "panel": "#FFFFFF",
+     "raised": "#EEF0F3",
+     "field": "#FFFFFF",
+     "text": "#1E2329",
+     "muted": "#56616C",
+     "line": "#DCE0E5",
+     "control": "#7A838D",
+     "disabled": "#7A838D",
+     "accent": "#145C4C",
+     "onAccent": "#FFFFFF",
+     "select": "#D6EBE4",
+     "hover": "#1E23290D",
+     "pressed": "#1E23291A",
+     "danger": "#A51F31",
+     "warning": "#8A5A00",
+     "success": "#008000"
+    },
+    "accents": [
+     {
+      "id": "red",
+      "title": "Red",
+      "accent": "#B3261E",
+      "onAccent": "#FFFFFF",
+      "select": "#EBD7D6"
+     },
+     {
+      "id": "orange",
+      "title": "Orange",
+      "accent": "#9C4600",
+      "onAccent": "#FFFFFF",
+      "select": "#EBDFD6"
+     },
+     {
+      "id": "gold",
+      "title": "Gold",
+      "accent": "#7A5E00",
+      "onAccent": "#FFFFFF",
+      "select": "#EBE6D6"
+     },
+     {
+      "id": "green",
+      "title": "Green",
+      "accent": "#145C4C",
+      "onAccent": "#FFFFFF",
+      "select": "#D6EBE4"
+     },
+     {
+      "id": "blue",
+      "title": "Blue",
+      "accent": "#1D5BA8",
+      "onAccent": "#FFFFFF",
+      "select": "#D6DFEB"
+     },
+     {
+      "id": "purple",
+      "title": "Purple",
+      "accent": "#5B3FB0",
+      "onAccent": "#FFFFFF",
+      "select": "#DBD6EB"
+     },
+     {
+      "id": "pink",
+      "title": "Pink",
+      "accent": "#9E2A73",
+      "onAccent": "#FFFFFF",
+      "select": "#EBD6E3"
+     }
+    ],
+    "content": {
+     "spellcheck": "#D70000",
+     "grammar": "#1A56DB",
+     "grid": {
+      "alternate": "#F0F2F4",
+      "warning": "#F4C7C7",
+      "comment": "#D6E3F5",
+      "comparison": [
+       "#FFFFFF",
+       "#FF000C",
+       "#B7AC00",
+       "#9C0000",
+       "#817900"
+      ],
+      "labels": {
+       "normal": "#9C9C9C",
+       "modified": "#B0ADD8",
+       "saved": "#BFBFBF",
+       "doubtful": "#925B1F"
+      }
+     },
+     "syntax": {
+      "curlyBraces": "#7E3B00",
+      "operators": "#787600",
+      "names": "#787600",
+      "values": "#34C200",
+      "splitAndDrawings": "#817F7F",
+      "templateVariables": "#BDB76B",
+      "templateCodeMarks": "#FB4544",
+      "templateFunctions": "#00C3FF",
+      "templateKeywords": "#8D80D3",
+      "templateStrings": "#11A243",
+      "drawingX": "#00796B",
+      "drawingY": "#AD1457"
+     },
+     "ports": {
+      "units": "#6B3FB0",
+      "tags": "#1E7A4F",
+      "number": "#1F5FAD",
+      "text": "#8A6100",
+      "colour": "#B0306A",
+      "point": "#A04E00",
+      "bool": "#5A6570",
+      "drawing": "#00707F"
+     },
+     "audio": {
+      "background": "#DDE3E8",
+      "lineStart": "#940000",
+      "lineEnd": "#940000",
+      "inactiveBoundary": "#00875A",
+      "cursor": "#4F56D6",
+      "secondBoundaries": "#20283237",
+      "keyframe": "#2E3A46",
+      "inactiveBackground": "#00000018",
+      "waveform": "#DDE3E8",
+      "waveformInactive": "#9AA5B0",
+      "waveformModified": "#C62828",
+      "timescaleBackground": "#EDF0F3",
+      "timescaleText": "#526170",
+      "spectrumBackground": "#FFFFFF",
+      "spectrumEcho": "#674FD7",
+      "spectrumInner": "#1A1F26",
+      "lineBoundaryMark": "#202832",
+      "syllableBoundaries": "#3A4652",
+      "syllableText": "#E0E3FF"
+     },
+     "visualTools": {
+      "handle": "#121150AA",
+      "handleSelected": "#FCE6B1AA",
+      "handleBorder": "#BB0000"
+     }
+    }
+   },
+   "problem": {
+    "stage": "contrast",
+    "path": "/content/audio/waveform",
+    "message": "/content/audio/waveform #DDE3E8 on audio background #DDE3E8 with the accent red measures 1.00:1, below 3.00:1"
+   }
+  },
+  {
+   "name": "the waveform is exempt in a dark theme",
+   "theme": {
+    "$schema": "https://hikarisub.altqx.com/schemas/hikari-theme.schema.json",
+    "type": "dark",
+    "roles": {
+     "background": "#181B20",
+     "panel": "#1E2127",
+     "raised": "#2A2E35",
+     "field": "#15171B",
+     "text": "#E4E7EB",
+     "muted": "#A0A8B2",
+     "line": "#2C3037",
+     "control": "#757E89",
+     "disabled": "#737B85",
+     "accent": "#9CDBC9",
+     "onAccent": "#102C24",
+     "select": "#304C47",
+     "hover": "#E4E7EB0F",
+     "pressed": "#E4E7EB1E",
+     "danger": "#FFADAD",
+     "warning": "#E0A030",
+     "success": "#4DBA4D"
+    },
+    "accents": [
+     {
+      "id": "red",
+      "title": "Red",
+      "accent": "#F4A9A3",
+      "onAccent": "#2C1210",
+      "select": "#4C3230"
+     },
+     {
+      "id": "orange",
+      "title": "Orange",
+      "accent": "#F5BB8A",
+      "onAccent": "#2C1D10",
+      "select": "#4C3D30"
+     },
+     {
+      "id": "gold",
+      "title": "Gold",
+      "accent": "#E3CF7E",
+      "onAccent": "#2C2610",
+      "select": "#4C4630"
+     },
+     {
+      "id": "green",
+      "title": "Green",
+      "accent": "#9CDBC9",
+      "onAccent": "#102C24",
+      "select": "#304C47"
+     },
+     {
+      "id": "blue",
+      "title": "Blue",
+      "accent": "#A6C8F2",
+      "onAccent": "#101D2C",
+      "select": "#303D4C"
+     },
+     {
+      "id": "purple",
+      "title": "Purple",
+      "accent": "#C6B5F4",
+      "onAccent": "#18102C",
+      "select": "#38304C"
+     },
+     {
+      "id": "pink",
+      "title": "Pink",
+      "accent": "#EFAAD3",
+      "onAccent": "#2C1021",
+      "select": "#4C3041"
+     }
+    ],
+    "content": {
+     "spellcheck": "#FF6B6B",
+     "grammar": "#6EA8FE",
+     "grid": {
+      "alternate": "#242A31",
+      "warning": "#7A2E2E",
+      "comment": "#253A57",
+      "comparison": [
+       "#2700FF",
+       "#272B32",
+       "#3A3E45",
+       "#003176",
+       "#3662A1"
+      ],
+      "labels": {
+       "normal": "#2F3136",
+       "modified": "#322F4E",
+       "saved": "#202225",
+       "doubtful": "#925B1F"
+      }
+     },
+     "syntax": {
+      "curlyBraces": "#8791FD",
+      "operators": "#00C3FF",
+      "names": "#00C3FF",
+      "values": "#0076FF",
+      "splitAndDrawings": "#ADABAB",
+      "templateVariables": "#BDB76B",
+      "templateCodeMarks": "#FB4544",
+      "templateFunctions": "#00C3FF",
+      "templateKeywords": "#8D80D3",
+      "templateStrings": "#11A243",
+      "drawingX": "#4EC9B0",
+      "drawingY": "#E5A0D9"
+     },
+     "ports": {
+      "units": "#C9A0FF",
+      "tags": "#7FD6A8",
+      "number": "#8EC5FF",
+      "text": "#F2C46D",
+      "colour": "#FF9EB5",
+      "point": "#FFB37A",
+      "bool": "#B0B8C0",
+      "drawing": "#66D9E8"
+     },
+     "audio": {
+      "background": "#36393E",
+      "lineStart": "#940000",
+      "lineEnd": "#940000",
+      "inactiveBoundary": "#00D77D",
+      "cursor": "#8791FD",
+      "secondBoundaries": "#F4F4F437",
+      "keyframe": "#F4F4F4",
+      "inactiveBackground": "#00000055",
+      "waveform": "#36393E",
+      "waveformInactive": "#2F3136",
+      "waveformModified": "#FF6968",
+      "timescaleBackground": "#202225",
+      "timescaleText": "#AEAFB2",
+      "spectrumBackground": "#000000",
+      "spectrumEcho": "#674FD7",
+      "spectrumInner": "#F4F4F4",
+      "lineBoundaryMark": "#FFFFFF",
+      "syllableBoundaries": "#202225",
+      "syllableText": "#8791FD"
+     },
+     "visualTools": {
+      "handle": "#121150AA",
+      "handleSelected": "#FCE6B1AA",
+      "handleBorder": "#BB0000"
+     }
+    }
+   },
+   "problem": null
+  },
+  {
+   "name": "a dark theme needs control",
+   "theme": {
+    "$schema": "https://hikarisub.altqx.com/schemas/hikari-theme.schema.json",
+    "type": "dark",
+    "roles": {
+     "background": "#181B20",
+     "panel": "#1E2127",
+     "raised": "#2A2E35",
+     "field": "#15171B",
+     "text": "#E4E7EB",
+     "muted": "#A0A8B2",
+     "line": "#2C3037",
+     "disabled": "#737B85",
+     "accent": "#9CDBC9",
+     "onAccent": "#102C24",
+     "select": "#304C47",
+     "hover": "#E4E7EB0F",
+     "pressed": "#E4E7EB1E",
+     "danger": "#FFADAD",
+     "warning": "#E0A030",
+     "success": "#4DBA4D"
+    },
+    "accents": [
+     {
+      "id": "red",
+      "title": "Red",
+      "accent": "#F4A9A3",
+      "onAccent": "#2C1210",
+      "select": "#4C3230"
+     },
+     {
+      "id": "orange",
+      "title": "Orange",
+      "accent": "#F5BB8A",
+      "onAccent": "#2C1D10",
+      "select": "#4C3D30"
+     },
+     {
+      "id": "gold",
+      "title": "Gold",
+      "accent": "#E3CF7E",
+      "onAccent": "#2C2610",
+      "select": "#4C4630"
+     },
+     {
+      "id": "green",
+      "title": "Green",
+      "accent": "#9CDBC9",
+      "onAccent": "#102C24",
+      "select": "#304C47"
+     },
+     {
+      "id": "blue",
+      "title": "Blue",
+      "accent": "#A6C8F2",
+      "onAccent": "#101D2C",
+      "select": "#303D4C"
+     },
+     {
+      "id": "purple",
+      "title": "Purple",
+      "accent": "#C6B5F4",
+      "onAccent": "#18102C",
+      "select": "#38304C"
+     },
+     {
+      "id": "pink",
+      "title": "Pink",
+      "accent": "#EFAAD3",
+      "onAccent": "#2C1021",
+      "select": "#4C3041"
+     }
+    ],
+    "content": {
+     "spellcheck": "#FF6B6B",
+     "grammar": "#6EA8FE",
+     "grid": {
+      "alternate": "#242A31",
+      "warning": "#7A2E2E",
+      "comment": "#253A57",
+      "comparison": [
+       "#2700FF",
+       "#272B32",
+       "#3A3E45",
+       "#003176",
+       "#3662A1"
+      ],
+      "labels": {
+       "normal": "#2F3136",
+       "modified": "#322F4E",
+       "saved": "#202225",
+       "doubtful": "#925B1F"
+      }
+     },
+     "syntax": {
+      "curlyBraces": "#8791FD",
+      "operators": "#00C3FF",
+      "names": "#00C3FF",
+      "values": "#0076FF",
+      "splitAndDrawings": "#ADABAB",
+      "templateVariables": "#BDB76B",
+      "templateCodeMarks": "#FB4544",
+      "templateFunctions": "#00C3FF",
+      "templateKeywords": "#8D80D3",
+      "templateStrings": "#11A243",
+      "drawingX": "#4EC9B0",
+      "drawingY": "#E5A0D9"
+     },
+     "ports": {
+      "units": "#C9A0FF",
+      "tags": "#7FD6A8",
+      "number": "#8EC5FF",
+      "text": "#F2C46D",
+      "colour": "#FF9EB5",
+      "point": "#FFB37A",
+      "bool": "#B0B8C0",
+      "drawing": "#66D9E8"
+     },
+     "audio": {
+      "background": "#36393E",
+      "lineStart": "#940000",
+      "lineEnd": "#940000",
+      "inactiveBoundary": "#00D77D",
+      "cursor": "#8791FD",
+      "secondBoundaries": "#F4F4F437",
+      "keyframe": "#F4F4F4",
+      "inactiveBackground": "#00000055",
+      "waveform": "#202225",
+      "waveformInactive": "#2F3136",
+      "waveformModified": "#FF6968",
+      "timescaleBackground": "#202225",
+      "timescaleText": "#AEAFB2",
+      "spectrumBackground": "#000000",
+      "spectrumEcho": "#674FD7",
+      "spectrumInner": "#F4F4F4",
+      "lineBoundaryMark": "#FFFFFF",
+      "syllableBoundaries": "#202225",
+      "syllableText": "#8791FD"
+     },
+     "visualTools": {
+      "handle": "#121150AA",
+      "handleSelected": "#FCE6B1AA",
+      "handleBorder": "#BB0000"
+     }
+    }
+   },
+   "problem": {
+    "stage": "schema"
+   }
+  },
+  {
+   "name": "an unknown type",
+   "theme": {
+    "$schema": "https://hikarisub.altqx.com/schemas/hikari-theme.schema.json",
+    "type": "sepia",
+    "roles": {
+     "background": "#181B20",
+     "panel": "#1E2127",
+     "raised": "#2A2E35",
+     "field": "#15171B",
+     "text": "#E4E7EB",
+     "muted": "#A0A8B2",
+     "line": "#2C3037",
+     "control": "#757E89",
+     "disabled": "#737B85",
+     "accent": "#9CDBC9",
+     "onAccent": "#102C24",
+     "select": "#304C47",
+     "hover": "#E4E7EB0F",
+     "pressed": "#E4E7EB1E",
+     "danger": "#FFADAD",
+     "warning": "#E0A030",
+     "success": "#4DBA4D"
+    },
+    "accents": [
+     {
+      "id": "red",
+      "title": "Red",
+      "accent": "#F4A9A3",
+      "onAccent": "#2C1210",
+      "select": "#4C3230"
+     },
+     {
+      "id": "orange",
+      "title": "Orange",
+      "accent": "#F5BB8A",
+      "onAccent": "#2C1D10",
+      "select": "#4C3D30"
+     },
+     {
+      "id": "gold",
+      "title": "Gold",
+      "accent": "#E3CF7E",
+      "onAccent": "#2C2610",
+      "select": "#4C4630"
+     },
+     {
+      "id": "green",
+      "title": "Green",
+      "accent": "#9CDBC9",
+      "onAccent": "#102C24",
+      "select": "#304C47"
+     },
+     {
+      "id": "blue",
+      "title": "Blue",
+      "accent": "#A6C8F2",
+      "onAccent": "#101D2C",
+      "select": "#303D4C"
+     },
+     {
+      "id": "purple",
+      "title": "Purple",
+      "accent": "#C6B5F4",
+      "onAccent": "#18102C",
+      "select": "#38304C"
+     },
+     {
+      "id": "pink",
+      "title": "Pink",
+      "accent": "#EFAAD3",
+      "onAccent": "#2C1021",
+      "select": "#4C3041"
+     }
+    ],
+    "content": {
+     "spellcheck": "#FF6B6B",
+     "grammar": "#6EA8FE",
+     "grid": {
+      "alternate": "#242A31",
+      "warning": "#7A2E2E",
+      "comment": "#253A57",
+      "comparison": [
+       "#2700FF",
+       "#272B32",
+       "#3A3E45",
+       "#003176",
+       "#3662A1"
+      ],
+      "labels": {
+       "normal": "#2F3136",
+       "modified": "#322F4E",
+       "saved": "#202225",
+       "doubtful": "#925B1F"
+      }
+     },
+     "syntax": {
+      "curlyBraces": "#8791FD",
+      "operators": "#00C3FF",
+      "names": "#00C3FF",
+      "values": "#0076FF",
+      "splitAndDrawings": "#ADABAB",
+      "templateVariables": "#BDB76B",
+      "templateCodeMarks": "#FB4544",
+      "templateFunctions": "#00C3FF",
+      "templateKeywords": "#8D80D3",
+      "templateStrings": "#11A243",
+      "drawingX": "#4EC9B0",
+      "drawingY": "#E5A0D9"
+     },
+     "ports": {
+      "units": "#C9A0FF",
+      "tags": "#7FD6A8",
+      "number": "#8EC5FF",
+      "text": "#F2C46D",
+      "colour": "#FF9EB5",
+      "point": "#FFB37A",
+      "bool": "#B0B8C0",
+      "drawing": "#66D9E8"
+     },
+     "audio": {
+      "background": "#36393E",
+      "lineStart": "#940000",
+      "lineEnd": "#940000",
+      "inactiveBoundary": "#00D77D",
+      "cursor": "#8791FD",
+      "secondBoundaries": "#F4F4F437",
+      "keyframe": "#F4F4F4",
+      "inactiveBackground": "#00000055",
+      "waveform": "#202225",
+      "waveformInactive": "#2F3136",
+      "waveformModified": "#FF6968",
+      "timescaleBackground": "#202225",
+      "timescaleText": "#AEAFB2",
+      "spectrumBackground": "#000000",
+      "spectrumEcho": "#674FD7",
+      "spectrumInner": "#F4F4F4",
+      "lineBoundaryMark": "#FFFFFF",
+      "syllableBoundaries": "#202225",
+      "syllableText": "#8791FD"
+     },
+     "visualTools": {
+      "handle": "#121150AA",
+      "handleSelected": "#FCE6B1AA",
+      "handleBorder": "#BB0000"
+     }
+    }
+   },
+   "problem": {
+    "stage": "schema"
+   }
+  }
+ ]
+}
