@@ -37,7 +37,7 @@
       "maxItems": 2,
       "uniqueItems": true,
       "items": {"enum": ["Timing", "Typesetting", "Karaoke", "Translation", "Styles and fonts", "Video and audio",
-                         "Import and export", "Quality checks", "Utilities"]}
+                         "Import and export", "Quality checks", "Utilities", "Themes"]}
     },
     "revoked": {
       "description": "Revokes the whole plugin.",
