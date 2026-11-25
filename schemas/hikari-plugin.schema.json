@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://hikarisub.altqx.com/schemas/hikari-plugin.schema.json",
   "title": "HikariSub plugin manifest (hikari-plugin.json)",
-  "description": "HikariSub's manifest schema (altqx/hikari docs/schemas/hikari-plugin.schema.json, main b364de77e), with the registry's own rule for SVG icons added to icon's description.",
+  "description": "HikariSub's manifest schema (altqx/hikari docs/schemas/hikari-plugin.schema.json, main d0e90fa), with the registry's own rule for SVG icons added to icon's description.",
   "type": "object",
   "required": ["id", "name", "version", "api", "authors"],
   "additionalProperties": false,
@@ -627,6 +627,15 @@
   "$defs": {
     "LocalId": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "maxLength": 64},
     "Title": {"type": "string", "minLength": 1, "maxLength": 100},
+    "ChoiceOption": {
+      "type": "object",
+      "required": ["value", "title"],
+      "additionalProperties": false,
+      "properties": {
+        "value": {"description": "What is saved and what hikari.settings.get returns; never shown.", "$ref": "#/$defs/LocalId"},
+        "title": {"description": "What the drop-down shows.", "$ref": "#/$defs/Title"}
+      }
+    },
     "Reason": {"type": "string", "minLength": 1, "maxLength": 300},
     "Host": {
       "description": "A host name the plugin may reach over HTTPS; no scheme, port or wildcard.",
@@ -951,8 +960,8 @@
             "id": {"$ref": "#/$defs/LocalId"},
             "title": {"$ref": "#/$defs/Title"},
             "type": {"const": "choice"},
-            "options": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"$ref": "#/$defs/Title"}},
-            "default": {"$ref": "#/$defs/Title"},
+            "options": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"$ref": "#/$defs/ChoiceOption"}},
+            "default": {"description": "The value of one of the options.", "$ref": "#/$defs/LocalId"},
             "description": {
               "description": "Plain text under the title.",
               "type": "string",
